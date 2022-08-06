@@ -1,0 +1,28 @@
+{
+	"name": "Torch env for development",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-python.vscode-pylance",
+				"ms-vsliveshare.vsliveshare-pack",
+				"njpwerner.autodocstring",
+				// Optional extensions
+				"GitHub.copilot",
+				// "eamodio.gitlens",
+				// "donjayamanne.githistory",
+				// "janisdd.vscode-edit-csv",
+				// "KevinRose.vsc-python-indent",
+				// "aaron-bond.better-comments",
+				// "njqdev.vscode-python-typehint"
+			]
+		}
+	},
+	"remoteUser": "container",
+	"features": {
+		"github-cli": "latest"
+	}
+}
