@@ -14,3 +14,8 @@ USER $USERNAME
 WORKDIR $WORK_DIR
 
 COPY --chown=$USERNAME . .
+
+ENV VENV_PATH=$WORK_DIR/venv
+ENV PATH="$VENV_PATH/bin:$PATH"
+RUN python -m venv $VENV_PATH
+RUN pip install -r requirements.txt

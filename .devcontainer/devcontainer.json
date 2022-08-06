@@ -1,8 +1,13 @@
 {
 	"name": "Torch env for development",
 	"build": {
-		"dockerfile": "Dockerfile"
+		"dockerfile": "Dockerfile",
+		"context": ".."
 	},
+	"runArgs": [
+		"--gpus",
+		"all"
+	],
 	"customizations": {
 		"vscode": {
 			"extensions": [
