@@ -1,46 +1,28 @@
-import os
-from os.path import isdir, join
-from pathlib import Path
-import pandas as pd
-
 import numpy as np
-from scipy.fftpack import fft
 from scipy import signal
 from scipy.io import wavfile
-
-from sklearn.decomposition import PCA
-import torch
-import numpy as np
 from scipy.fftpack import fft
+import numpy as np
 from scipy import signal
 from scipy.io import wavfile
-from torchaudio.datasets import SPEECHCOMMANDS
-
 import matplotlib.pyplot as plt
-import seaborn as sns
-import IPython.display as ipd
-import librosa.display
-
-import plotly.offline as py
-import plotly.graph_objs as go
-import plotly.tools as tls
-import pandas as pd
 
 
-def log_specgram(audio, sample_rate, window_size=20,
-                 step_size=10, eps=1e-10):
-    nperseg = int(round(window_size * sample_rate / 1e3))
-    noverlap = int(round(step_size * sample_rate / 1e3))
+def log_specgram(audio, sample_rate):
+    """Wrapper of scipy.signal.spectrogram"""
+    nperseg = int(round(20 * sample_rate / 1e3))
+    noverlap = int(round(10 * sample_rate / 1e3))
     freqs, times, spec = signal.spectrogram(audio,
                                     fs=sample_rate,
                                     window='hann',
                                     nperseg=nperseg,
                                     noverlap=noverlap,
                                     detrend=False)
-    return freqs, times, np.log(spec.T.astype(np.float32) + eps)
+    return freqs, times, np.log(spec.T.astype(np.float32) + 1e-10)
 
 
 def plot_audio(file_name):
+    """Plot audio array and spectrogram"""
     sample_rate, samples = wavfile.read(file_name)
     freqs, times, spectrogram = log_specgram(samples, sample_rate)
 
@@ -58,3 +40,24 @@ def plot_audio(file_name):
     ax2.set_title('Spectrogram')
     ax2.set_ylabel('Freqs in Hz')
     ax2.set_xlabel('Seconds')
+
+
+def plot_fft(file_name):
+    sample_rate, samples = wavfile.read(file_name)
+    xf, vals = custom_fft(samples, sample_rate)
+    plt.figure(figsize=(12, 4))
+    plt.title('FFT of recording sampled with ' + str(sample_rate) + ' Hz')
+    plt.plot(xf, vals)
+    plt.xlabel('Frequency')
+    plt.grid()
+    plt.show()
+
+def custom_fft(y, fs):
+    """Custom fft function for plotting"""
+    T = 1.0 / fs
+    N = y.shape[0]
+    yf = fft(y)
+    xf = np.linspace(0.0, 1.0/(2.0*T), N//2)
+    vals = 2.0/N * np.abs(yf[0:N//2])  # FFT is simmetrical, so we take just the first half
+    # FFT is also complex, to we take just the real part (abs)
+    return xf, vals
