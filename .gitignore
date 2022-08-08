@@ -1,3 +1,9 @@
+# User define
+output*
+dummy*
+SpeechCommands
+speech_commands_v0.02.tar.gz
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

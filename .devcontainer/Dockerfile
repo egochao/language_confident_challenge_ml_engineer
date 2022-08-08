@@ -1,5 +1,8 @@
 FROM pytorch/pytorch:1.12.0-cuda11.3-cudnn8-runtime as base_image
 
+RUN apt-get clean \
+    && apt-get update \
+    && apt-get install -y libsndfile1
 
 ARG USERNAME=container
 ARG USER_UID=500

@@ -1,2 +1,11 @@
 scipy
 torch
+torchaudio
+sklearn
+plotly
+pandas
+matplotlib
+seaborn
+librosa
+jupyter
+notebook

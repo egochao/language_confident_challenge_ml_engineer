@@ -1,0 +1,14 @@
+# User define
+output*
+dummy*
+*SpeechCommands*
+*speech_commands_v0.02.tar.gz*
+data
+
+# Environments
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
