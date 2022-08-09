@@ -10,3 +10,8 @@ librosa
 jupyter
 notebook
 tqdm
+torchmetrics
+wandb
+transformers
+vit-pytorch
+pytorch-lightning
