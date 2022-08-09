@@ -8,7 +8,7 @@ def get_likely_index(tensor):
     return tensor.argmax(dim=-1)
 
 
-def test(model, epoch, test_loader, transform, device):
+def test(model, epoch, test_loader,  device):
     model.eval()
     correct = 0
     for data, target in test_loader:
@@ -16,8 +16,6 @@ def test(model, epoch, test_loader, transform, device):
         data = data.to(device)
         target = target.to(device)
 
-        # apply transform and model on whole batch directly on device
-        data = transform(data)
         output = model(data)
 
         pred = get_likely_index(output)
