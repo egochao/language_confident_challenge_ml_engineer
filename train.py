@@ -1,27 +1,21 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import torchaudio
-import sys
 
-import matplotlib.pyplot as plt
-import IPython.display as ipd
 
 from tqdm import tqdm
 
 from dataset import SubsetSC, collate_fn
 from models.simple_conv import SimpleConv
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-if device == "cuda":
-    num_workers = 1
-    pin_memory = True
-else:
-    num_workers = 0
-    pin_memory = False
-batch_size = 32
 
-# Create training and testing split of the data. We do not use validation in this tutorial.
+from constants import BATCH_SIZE, LABELS
+
+from utils.model_utils import get_device_and_num_workers, count_parameters
+
+device, num_workers, pin_memory = get_device_and_num_workers()
+
+
 train_set = SubsetSC("training")
 test_set = SubsetSC("testing")
 
@@ -29,7 +23,7 @@ waveform, sample_rate, label, speaker_id, utterance_number = train_set[0]
 
 train_loader = torch.utils.data.DataLoader(
     train_set,
-    batch_size=batch_size,
+    batch_size=BATCH_SIZE,
     shuffle=True,
     collate_fn=collate_fn,
     num_workers=num_workers,
@@ -37,7 +31,7 @@ train_loader = torch.utils.data.DataLoader(
 )
 test_loader = torch.utils.data.DataLoader(
     test_set,
-    batch_size=batch_size,
+    batch_size=BATCH_SIZE,
     shuffle=False,
     drop_last=False,
     collate_fn=collate_fn,
@@ -50,19 +44,13 @@ print(test_loader)
 
 
 waveform, sample_rate, label, speaker_id, utterance_number = train_set[0]
-labels = sorted(list(set(datapoint[2] for datapoint in train_set)))
-print(labels)
 new_sample_rate = 8000
 transform = torchaudio.transforms.Resample(orig_freq=sample_rate, new_freq=new_sample_rate)
 transformed = transform(waveform)
 
-model = SimpleConv(n_input=transformed.shape[0], n_output=len(labels))
+model = SimpleConv(n_input=transformed.shape[0], n_output=len(LABELS))
 model.to(device)
 print(model)
-
-def count_parameters(model):
-    return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
 
 n = count_parameters(model)
 print("Number of parameters: %s" % n)
