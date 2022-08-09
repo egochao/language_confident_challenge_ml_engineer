@@ -1,10 +1,34 @@
-from models.vit_transformer import ViTConfigExtended, Backbone, LitClassifier
-
+from models.vit_transformer import VisionTransformer, LitClassifier
+import torch
+from datasets.sc_dataset import SpeechCommandDataModule
+from utils.model_utils import get_loader_params
+import pytorch_lightning as pl
+from pytorch_lightning.loggers import WandbLogger
 
 
 if __name__ == '__main__':
-    configuration = ViTConfigExtended()
+    pl.seed_everything(0)
+    wandb_logger = WandbLogger(project='ViT_experiments')
 
-    backbone = Backbone(model_type='vit', config=configuration)
-    model = LitClassifier(backbone)
-    print(model)
+    data_dir = './data/'
+    batch_size = 256
+    num_workers, pin_memory = get_loader_params()
+    data_module = SpeechCommandDataModule(data_dir, batch_size)
+    data_module.prepare_data()
+    data_module.setup()
+
+    # for idx, batch in enumerate(data_module.train_dataloader()):
+    #     print(idx)
+    #     # print(batch)
+    #     if idx > 1000:
+    #         break
+    core_model = VisionTransformer()
+    model = LitClassifier(core_model)
+
+    if torch.cuda.is_available():
+        trainer = pl.Trainer(gpus=1, max_epochs=10, logger=wandb_logger)
+    else:
+        trainer = pl.Trainer(max_epochs=10, logger=wandb_logger)
+
+    # train, validate
+    trainer.fit(model, data_module)

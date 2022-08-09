@@ -4,7 +4,7 @@ import torch
 def get_loader_params():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if device == "cuda":
-        num_workers = 1
+        num_workers = 2
         pin_memory = True
     else:
         num_workers = 0

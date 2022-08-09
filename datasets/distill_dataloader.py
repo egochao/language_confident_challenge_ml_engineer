@@ -48,7 +48,8 @@ class AudioDistillDataset(Dataset):
 
         label_list = [filepath.parent.stem for filepath in self.audio_path_list]
         self.label_list = [constants.LABELS.index(label) for label in label_list if label in constants.LABELS]
-
+        self.transform = torchaudio.transforms.Resample(orig_freq=constants.ORIGINAL_SAMPLE_RATE, new_freq=constants.NEW_SAMPLE_RATE)
+        
     def _load_logits(self, filepath:Path) -> torch.Tensor:
         return torch.load(filepath)
 
@@ -56,12 +57,28 @@ class AudioDistillDataset(Dataset):
         # modify this function for audio preprocessing
         # STFT for example
         waveform, sr = torchaudio.load(filepath)
+        waveform = self.transform(waveform)
+
         waveform = waveform - waveform.mean()
-        if waveform.shape[1] < constants.INPUT_AUDIO_LENGTH:
-            waveform = torch.cat([waveform, torch.zeros((1 ,constants.INPUT_AUDIO_LENGTH - waveform.shape[1]))], dim=1)
         fbank = torchaudio.compliance.kaldi.fbank(waveform, htk_compat=True, sample_frequency=sr, use_energy=False,
                                                   window_type='hanning', num_mel_bins=128, dither=0.0, frame_shift=10)
-        return fbank, sr
+
+        fbank = self._pad_spec(fbank)
+        fbank = torch.unsqueeze(fbank, dim=0)
+
+        return fbank
+
+    def _pad_spec(self, spec):
+        target_length = constants.PADDED_SPEC_HEIGHTS
+        n_frames = spec.shape[0]
+        miss_match_dimension = target_length - n_frames
+        # cut and pad
+        if miss_match_dimension > 0:
+            pad = torch.nn.ZeroPad2d((0, 0, 0, miss_match_dimension))
+            spec = pad(spec)
+        elif miss_match_dimension < 0:
+            spec = spec[0:target_length, :]
+        return spec
 
     def __len__(self):
         return len(self.label_list)
@@ -71,7 +88,7 @@ class AudioDistillDataset(Dataset):
         label = self.label_list[index]
         if self.logits_path:
             teacher_logits = self._load_logits(self.logit_path_list[index])
-            output =  {'student_input': student_input, 'teacher_logits': teacher_logits, 'label': self.label_list[index]}
+            output =  student_input, teacher_logits, label
         else:
-            output = {'student_input': student_input, 'label': self.label_list[index]}
+            output = student_input, label
         return output
