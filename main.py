@@ -12,8 +12,6 @@ configuration = ViTConfigExtended()
 
 # setup data
 dm = CIFAR10DataModule(batch_size=32, image_size=configuration.image_size)
-
-
 dm.prepare_data()
 dm.setup('fit')
 

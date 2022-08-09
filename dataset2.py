@@ -9,8 +9,6 @@ from torchvision import transforms
 from torchvision.datasets import CIFAR10
 
 
-
-
 class CIFAR10DataModule(LightningDataModule):
 
     def __init__(self, data_dir='./data/', batch_size=256, image_size=32):

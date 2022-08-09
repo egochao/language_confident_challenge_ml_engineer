@@ -1,10 +1,14 @@
 import torch
 from torchaudio.datasets import SPEECHCOMMANDS
 import os
-
-from constants import BATCH_SIZE
+from pytorch_lightning import LightningDataModule
+from torch.utils.data import DataLoader
+from pytorch_lightning import LightningDataModule
+from constants import BATCH_SIZE, ORIGINAL_SAMPLE_RATE, NEW_SAMPLE_RATE
 import constants
 from utils.model_utils import get_loader_params
+from torch.utils.data import DataLoader
+import torchaudio
 
 def get_dataloader(name, batch_size=BATCH_SIZE, shuffle=True, drop_last=True):
     num_workers, pin_memory = get_loader_params()
@@ -24,6 +28,61 @@ def get_dataloader(name, batch_size=BATCH_SIZE, shuffle=True, drop_last=True):
     if name == "training":
         constants.LABELS = labels
     return dataloader
+
+class SpeechCommandDataModule(LightningDataModule):
+
+    def __init__(self, data_dir='./data/', batch_size=256):
+        super().__init__()
+        self.batch_size = batch_size
+        self.data_dir = data_dir
+        num_workers, pin_memory = get_loader_params()
+        self.num_workers = num_workers
+        self.pin_memory = pin_memory
+
+    def prepare_data(self):
+        '''called only once and on 1 GPU'''
+        # download data
+        SPEECHCOMMANDS(self.data_dir, download=True)
+
+
+    def setup(self):
+        '''called every time a new epoch begins'''
+        self.train_dataset = SubsetSC("training")
+        self.val_dataset = SubsetSC("validation")
+        self.test_dataset = SubsetSC("testing")
+
+    def train_dataloader(self):
+        return DataLoader(
+            self.train_dataset,
+            batch_size=self.batch_size,
+            shuffle=True,
+            drop_last=True,
+            collate_fn=collate_fn,
+            num_workers=self.num_workers,
+            pin_memory=self.pin_memory,
+            )      
+    def val_dataloader(self):
+        return DataLoader(
+            self.val_dataset,
+            batch_size=self.batch_size,
+            shuffle=False,
+            drop_last=False,
+            collate_fn=collate_fn,
+            num_workers=self.num_workers,
+            pin_memory=self.pin_memory,
+            )
+    
+    def test_dataloader(self):
+        return DataLoader(
+            self.test_dataset,
+            batch_size=self.batch_size,
+            shuffle=False,
+            drop_last=False,
+            collate_fn=collate_fn,
+            num_workers=self.num_workers,
+            pin_memory=self.pin_memory,
+            )
+        
 
 class SubsetSC(SPEECHCOMMANDS):
     def __init__(self, subset: str = None):
@@ -60,6 +119,8 @@ def pad_sequence(batch):
     batch = torch.nn.utils.rnn.pad_sequence(batch, batch_first=True, padding_value=0.)
     return batch.permute(0, 2, 1)
 
+transform = torchaudio.transforms.Resample(orig_freq=ORIGINAL_SAMPLE_RATE, new_freq=NEW_SAMPLE_RATE)
+transform = transform.to("cuda")
 
 def collate_fn(batch):
 
@@ -75,7 +136,17 @@ def collate_fn(batch):
 
     # Group the list of tensors into a batched tensor
     tensors = pad_sequence(tensors)
+    tensors = transform(tensors)
     targets = torch.stack(targets)
 
     return tensors, targets
 
+if __name__ == '__main__':
+    dm = SpeechCommandDataModule()
+    dm.prepare_data()
+    dm.setup(stage="fit")
+
+    for idx, data in enumerate(dm.train_dataloader()):
+        print(data)
+        if idx > 2:
+            break

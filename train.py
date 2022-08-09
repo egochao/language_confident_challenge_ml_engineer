@@ -11,7 +11,7 @@ import constants
 
 from test import test
 
-def train(model, loader, optimizer, transform, device, epoch=40, log_interval=40):
+def train(model, loader, optimizer, device, epoch=40, log_interval=40):
     model.train()
     losses = []
     for batch_idx, (data, target) in enumerate(loader):
@@ -20,7 +20,6 @@ def train(model, loader, optimizer, transform, device, epoch=40, log_interval=40
         target = target.to(device)
 
         # apply transform and model on whole batch directly on device
-        data = transform(data)
         output = model(data)
 
         # negative log-likelihood for a tensor of size (batch x 1 x n_output)
@@ -41,12 +40,16 @@ def train(model, loader, optimizer, transform, device, epoch=40, log_interval=40
 
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    from dataset import SpeechCommandDataModule
+    dm = SpeechCommandDataModule()
+    dm.prepare_data()
+    dm.setup()
 
-    train_loader = get_dataloader("training", BATCH_SIZE, shuffle=True, drop_last=True)
-    test_loader = get_dataloader("testing", BATCH_SIZE, shuffle=False, drop_last=False)
-    val_loader = get_dataloader("validation", BATCH_SIZE, shuffle=False, drop_last=False)
 
-    transform = torchaudio.transforms.Resample(orig_freq=ORIGINAL_SAMPLE_RATE, new_freq=NEW_SAMPLE_RATE)
+    train_loader = dm.train_dataloader()
+    test_loader = dm.test_dataloader()
+    val_loader = dm.val_dataloader()
+
 
     model = SimpleConv(n_input=1, n_output=len(constants.LABELS))
     model.to(device)
@@ -58,10 +61,9 @@ def main():
     epoch = 40
 
     # The transform needs to live on the same device as the model and the data.
-    transform = transform.to(device)
     for epoch in range(1, epoch + 1):
-        train(model, train_loader, optimizer, transform, device, epoch, log_interval)
-        test(model, epoch, test_loader, transform, device)
+        train(model, train_loader, optimizer, device, epoch, log_interval)
+        test(model, epoch, test_loader, device)
         scheduler.step()
 
 
