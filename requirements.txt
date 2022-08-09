@@ -10,3 +10,4 @@ seaborn
 librosa
 jupyter
 notebook
+tqdm
