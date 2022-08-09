@@ -4,9 +4,9 @@ dummy*
 *SpeechCommands*
 *speech_commands_v0.02.tar.gz*
 data
-models/wandb
-models/data
-*/core
+wandb
+data
+*core
 
 # Environments
 .venv

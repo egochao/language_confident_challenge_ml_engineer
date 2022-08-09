@@ -1,5 +1,5 @@
 import torch
-from dataset2 import CIFAR100DataModule, CIFAR10DataModule
+from dataset2 import CIFAR10DataModule
 from models.vit_transformer import ViTConfigExtended, Backbone, LitClassifier
 from pytorch_lightning.loggers import WandbLogger
 import pytorch_lightning as pl

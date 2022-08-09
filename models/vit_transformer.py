@@ -7,7 +7,6 @@ import torch
 import torch.nn
 import torchmetrics
 
-# Pytorch-Lightning
 from torch import nn
 from torch.nn import functional as F
 from transformers import ViTConfig
