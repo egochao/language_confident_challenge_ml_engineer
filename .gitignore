@@ -4,9 +4,9 @@ dummy*
 SpeechCommands
 speech_commands_v0.02.tar.gz
 speech_commands_v0.01.tar.gz
-models/wandb
-models/data
-*/core
+wandb
+data
+*core
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
