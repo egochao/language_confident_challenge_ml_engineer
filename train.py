@@ -6,49 +6,22 @@ import torchaudio
 
 from tqdm import tqdm
 
-from dataset import SubsetSC, collate_fn
+from dataset import get_dataloader
 from models.simple_conv import SimpleConv
 
-from constants import BATCH_SIZE, LABELS
+from constants import BATCH_SIZE, LABELS, ORIGINAL_SAMPLE_RATE, NEW_SAMPLE_RATE
 
-from utils.model_utils import get_device_and_num_workers, count_parameters
+from utils.model_utils import count_parameters
 
-device, num_workers, pin_memory = get_device_and_num_workers()
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+train_loader = get_dataloader("training", BATCH_SIZE, shuffle=True, drop_last=True)
+test_loader = get_dataloader("testing", BATCH_SIZE, shuffle=False, drop_last=False)
+val_loader = get_dataloader("validation", BATCH_SIZE, shuffle=False, drop_last=False)
 
-train_set = SubsetSC("training")
-test_set = SubsetSC("testing")
+transform = torchaudio.transforms.Resample(orig_freq=ORIGINAL_SAMPLE_RATE, new_freq=NEW_SAMPLE_RATE)
 
-waveform, sample_rate, label, speaker_id, utterance_number = train_set[0]
-
-train_loader = torch.utils.data.DataLoader(
-    train_set,
-    batch_size=BATCH_SIZE,
-    shuffle=True,
-    collate_fn=collate_fn,
-    num_workers=num_workers,
-    pin_memory=pin_memory,
-)
-test_loader = torch.utils.data.DataLoader(
-    test_set,
-    batch_size=BATCH_SIZE,
-    shuffle=False,
-    drop_last=False,
-    collate_fn=collate_fn,
-    num_workers=num_workers,
-    pin_memory=pin_memory,
-)
-print(train_loader)
-print(test_loader)
-
-
-
-waveform, sample_rate, label, speaker_id, utterance_number = train_set[0]
-new_sample_rate = 8000
-transform = torchaudio.transforms.Resample(orig_freq=sample_rate, new_freq=new_sample_rate)
-transformed = transform(waveform)
-
-model = SimpleConv(n_input=transformed.shape[0], n_output=len(LABELS))
+model = SimpleConv(n_input=1, n_output=len(LABELS))
 model.to(device)
 print(model)
 

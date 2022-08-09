@@ -1,7 +1,7 @@
 import torch
 
 
-def get_device_and_num_workers():
+def get_loader_params():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if device == "cuda":
         num_workers = 1
@@ -10,7 +10,7 @@ def get_device_and_num_workers():
         num_workers = 0
         pin_memory = False
 
-    return device, num_workers, pin_memory
+    return num_workers, pin_memory
 
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)

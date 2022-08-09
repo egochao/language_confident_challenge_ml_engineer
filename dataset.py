@@ -2,7 +2,25 @@ import torch
 from torchaudio.datasets import SPEECHCOMMANDS
 import os
 
-from constants import LABELS 
+from constants import LABELS , BATCH_SIZE
+
+from utils.model_utils import get_loader_params
+
+def get_dataloader(name, batch_size=BATCH_SIZE, shuffle=True, drop_last=True):
+    num_workers, pin_memory = get_loader_params()
+
+    dataset = SubsetSC("training")
+    dataloader = torch.utils.data.DataLoader(
+    dataset,
+    batch_size=batch_size,
+    shuffle=shuffle,
+    drop_last=drop_last,
+    collate_fn=collate_fn,
+    num_workers=num_workers,
+    pin_memory=pin_memory,
+    )      
+    
+    return dataloader
 
 class SubsetSC(SPEECHCOMMANDS):
     def __init__(self, subset: str = None):
