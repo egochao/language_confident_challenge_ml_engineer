@@ -58,9 +58,7 @@ class AudioDistillDataset(Dataset):
         waveform, sr = torchaudio.load(filepath)
         waveform = waveform - waveform.mean()
         if waveform.shape[1] < constants.INPUT_AUDIO_LENGTH:
-            print(waveform.shape)
             waveform = torch.cat([waveform, torch.zeros((1 ,constants.INPUT_AUDIO_LENGTH - waveform.shape[1]))], dim=1)
-            print(f"{filepath} is padded with {constants.INPUT_AUDIO_LENGTH - waveform.shape[1]} zeros")
         fbank = torchaudio.compliance.kaldi.fbank(waveform, htk_compat=True, sample_frequency=sr, use_energy=False,
                                                   window_type='hanning', num_mel_bins=128, dither=0.0, frame_shift=10)
         return fbank, sr

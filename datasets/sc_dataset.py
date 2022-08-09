@@ -1,12 +1,9 @@
 import torch
 from torchaudio.datasets import SPEECHCOMMANDS
-import os
 from pytorch_lightning import LightningDataModule
-from torch.utils.data import DataLoader
 from pytorch_lightning import LightningDataModule
 import constants
 from utils.model_utils import get_loader_params
-from torch.utils.data import DataLoader
 from pathlib import Path
 from datasets.distill_dataloader import AudioDistillDataset
 
@@ -58,13 +55,3 @@ if __name__ == '__main__':
         print(batch['student_input'][0].shape)
         if idx > 1000:
             break
-    # for idx, batch in enumerate(val_loader):
-    #     print(idx)
-    #     print(batch['student_input'][0].shape)
-    #     if idx > 1000:
-    #         break
-    # for idx, batch in enumerate(test_loader):
-    #     print(idx)
-    #     print(batch['student_input'][0].shape)
-    #     if idx > 1000:
-            # break
