@@ -2,14 +2,14 @@ import torch
 from torchaudio.datasets import SPEECHCOMMANDS
 import os
 
-from constants import LABELS , BATCH_SIZE
-
+from constants import LABELS, BATCH_SIZE
+import constants
 from utils.model_utils import get_loader_params
 
 def get_dataloader(name, batch_size=BATCH_SIZE, shuffle=True, drop_last=True):
     num_workers, pin_memory = get_loader_params()
 
-    dataset = SubsetSC("training")
+    dataset = SubsetSC(name)
     dataloader = torch.utils.data.DataLoader(
     dataset,
     batch_size=batch_size,
@@ -19,7 +19,10 @@ def get_dataloader(name, batch_size=BATCH_SIZE, shuffle=True, drop_last=True):
     num_workers=num_workers,
     pin_memory=pin_memory,
     )      
-    
+
+    labels = sorted(list(set(datapoint[2] for datapoint in dataset)))
+    if name == "training":
+        constants.LABELS = labels
     return dataloader
 
 class SubsetSC(SPEECHCOMMANDS):

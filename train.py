@@ -6,7 +6,8 @@ import torchaudio
 from dataset import get_dataloader
 from models.simple_conv import SimpleConv
 
-from constants import BATCH_SIZE, LABELS, ORIGINAL_SAMPLE_RATE, NEW_SAMPLE_RATE
+from constants import BATCH_SIZE, ORIGINAL_SAMPLE_RATE, NEW_SAMPLE_RATE
+import constants
 
 from utils.model_utils import count_parameters
 from test import test
@@ -48,7 +49,7 @@ def main():
 
     transform = torchaudio.transforms.Resample(orig_freq=ORIGINAL_SAMPLE_RATE, new_freq=NEW_SAMPLE_RATE)
 
-    model = SimpleConv(n_input=1, n_output=len(LABELS))
+    model = SimpleConv(n_input=1, n_output=len(constants.LABELS))
     model.to(device)
 
     optimizer = optim.Adam(model.parameters(), lr=0.01, weight_decay=0.0001)
