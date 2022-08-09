@@ -11,6 +11,7 @@ from torch import nn
 from torch.nn import functional as F
 from transformers import ViTConfig
 from vit_pytorch import ViT
+from vit_pytorch.vit import Transformer, pair
 import torch
 from torch import nn
 
@@ -19,10 +20,6 @@ from einops.layers.torch import Rearrange
 
 from argparse import ArgumentParser
 
-
-
-def pair(t):
-    return t if isinstance(t, tuple) else (t, t)
 
 class ViTConfigExtended(ViTConfig):
     def __init__(self, hidden_size=768,
@@ -174,11 +171,3 @@ class LitClassifier(pl.LightningModule):
         parser = ArgumentParser(parents=[parent_parser], add_help=False)
         parser.add_argument('--learning_rate', type=float, default=0.0001)
         return parser
-
-
-if __name__ == '__main__':
-    configuration = ViTConfigExtended()
-
-    backbone = Backbone(model_type='vit', config=configuration)
-    model = LitClassifier(backbone)
-    print(model)

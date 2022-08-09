@@ -6,6 +6,7 @@ from models.vit_transformer import Backbone, LitClassifier, ViTConfigExtended
 import pytorch_lightning as pl
 import wandb
 from pytorch_lightning.loggers import WandbLogger
+from datasets.sc_dataset import SpeechCommandDataModule
 
 
 
@@ -14,8 +15,7 @@ def main():
     pl.seed_everything(0)
     wandb_logger = WandbLogger(project='ViT_experiments')
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    from datasets import SpeechCommandDataModule
+    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     dm = SpeechCommandDataModule()
     dm.prepare_data()
     dm.setup()
