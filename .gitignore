@@ -7,6 +7,7 @@ speech_commands_v0.01.tar.gz
 wandb
 data
 *core
+data/teacher_logits
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

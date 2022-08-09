@@ -7,6 +7,7 @@ data
 wandb
 data
 *core
+data/teacher_logits
 
 # Environments
 .venv

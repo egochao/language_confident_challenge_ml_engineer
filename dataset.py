@@ -144,9 +144,9 @@ def collate_fn(batch):
 if __name__ == '__main__':
     dm = SpeechCommandDataModule()
     dm.prepare_data()
-    dm.setup(stage="fit")
+    dm.setup()
 
     for idx, data in enumerate(dm.train_dataloader()):
-        print(data)
-        if idx > 2:
+        print(data[0].shape)
+        if idx > 10:
             break
