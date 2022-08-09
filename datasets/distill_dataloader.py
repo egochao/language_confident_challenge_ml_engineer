@@ -4,7 +4,7 @@ import torchaudio
 import torch
 import torch.nn.functional
 from torch.utils.data import Dataset
-
+import constants
 
 LABEL_LIST =  ["backward", "follow", "five", "bed", "zero", "on", "learn", "two", "house", "tree", "dog", "stop", "seven", "eight", "down", "six", "forward", "cat", "right", "visual", "four",
     "wow", "no", "nine", "off", "three", "left", "marvin", "yes", "up", "sheila", "happy", "bird", "go", "one"
@@ -56,6 +56,10 @@ class AudioDistillDataset(Dataset):
         # STFT for example
         waveform, sr = torchaudio.load(filepath)
         waveform = waveform - waveform.mean()
+        if waveform.shape[1] < constants.INPUT_AUDIO_LENGTH:
+            print(waveform.shape)
+            waveform = torch.cat([waveform, torch.zeros((1 ,constants.INPUT_AUDIO_LENGTH - waveform.shape[1]))], dim=1)
+            print(f"{filepath} is padded with {constants.INPUT_AUDIO_LENGTH - waveform.shape[1]} zeros")
         return waveform, sr
 
     def __len__(self):

@@ -16,7 +16,9 @@ eval_loader = torch.utils.data.DataLoader(
 )
 
 for idx, batch in enumerate(eval_loader):
+    print(idx)
     print(batch['student_input'][0].shape)
     print(batch['teacher_logits'][0].shape)
     print(batch['label'][0].shape)
-    break
+    if idx > 1000:
+        break
