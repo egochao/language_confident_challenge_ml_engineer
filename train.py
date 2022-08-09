@@ -9,7 +9,6 @@ from models.simple_conv import SimpleConv
 from constants import BATCH_SIZE, ORIGINAL_SAMPLE_RATE, NEW_SAMPLE_RATE
 import constants
 
-from utils.model_utils import count_parameters
 from test import test
 
 def train(model, loader, optimizer, transform, device, epoch=40, log_interval=40):
