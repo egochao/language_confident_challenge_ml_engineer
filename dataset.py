@@ -24,7 +24,7 @@ def get_dataloader(name, batch_size=BATCH_SIZE, shuffle=True, drop_last=True):
 
 class SubsetSC(SPEECHCOMMANDS):
     def __init__(self, subset: str = None):
-        super().__init__("./data", download=True, url='speech_commands_v0.01')
+        super().__init__("./data", download=True, url='speech_commands_v0.02')
 
         def load_list(filename):
             filepath = os.path.join(self._path, filename)
