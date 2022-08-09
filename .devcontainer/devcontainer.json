@@ -6,7 +6,8 @@
 	},
 	"runArgs": [
 		"--gpus",
-		"all"
+		"all",
+		"--shm-size=512m"
 	],
 	"customizations": {
 		"vscode": {
@@ -16,7 +17,7 @@
 				"ms-vsliveshare.vsliveshare-pack",
 				"njpwerner.autodocstring",
 				// Optional extensions
-				"GitHub.copilot",
+				"GitHub.copilot"
 				// "eamodio.gitlens",
 				// "donjayamanne.githistory",
 				// "janisdd.vscode-edit-csv",
