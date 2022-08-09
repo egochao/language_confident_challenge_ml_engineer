@@ -1,6 +1,7 @@
 scipy
 torch
 torchaudio
+torchvision
 sklearn
 plotly
 pandas

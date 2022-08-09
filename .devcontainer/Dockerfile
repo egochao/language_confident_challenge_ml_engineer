@@ -5,7 +5,7 @@ RUN apt-get clean \
     && apt-get install -y libsndfile1
 
 ARG USERNAME=container
-ARG USER_UID=500
+ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 ARG WORK_DIR=/home/$USERNAME
 
@@ -21,4 +21,4 @@ COPY --chown=$USERNAME . .
 ENV VENV_PATH=$WORK_DIR/venv
 ENV PATH="$VENV_PATH/bin:$PATH"
 RUN python -m venv $VENV_PATH
-RUN pip install -r requirements.txt
+# RUN pip install -r requirements.txt
