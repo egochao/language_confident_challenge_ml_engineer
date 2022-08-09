@@ -5,6 +5,7 @@ import torch
 import torch.nn.functional
 from torch.utils.data import Dataset
 import constants
+from typing import Optional
 
 def _create_train_subset_file(base_path):
     with open(base_path / 'validation_list.txt', 'r') as f:
@@ -20,29 +21,33 @@ def _create_train_subset_file(base_path):
 
     training_list = [x for x in all_list if x not in val_test_list]
     with open(base_path / 'train_list.txt', 'w') as f:
-        f.writelines(training_list)
+        for line in training_list:
+            f.write(f"{line}\n")
+
 
 class AudioDistillDataset(Dataset):
-    def __init__(self, audios_path: Path, logits_path: Path, subset: str):
-        """_summary_
+    def __init__(self, audios_path: Path, subset: str, logits_path: Optional[Path] = None):
+        """Loads speech commands dataset with optional teacher model last layer logits.
 
         Args:
             audios_path (Path): path to speech command dataset
             logits_path (Path): path to teacher logit
             subset (str): 'train' or 'validation' or 'testing'
         """
+        self.logits_path = logits_path
         subset_file = audios_path / f'{subset}_list.txt'
-        if subset == "train" and not subset_file.exists():
+        if subset == "train":
             _create_train_subset_file(audios_path)
 
         with open(subset_file, 'r') as f:
             file_list = f.readlines()
 
         self.audio_path_list = [audios_path / sub_path.strip() for sub_path in file_list]
-        self.logit_path_list = [logits_path / sub_path.strip().replace('wav', 'pt') for sub_path in file_list]
+        if self.logits_path:
+            self.logit_path_list = [logits_path / sub_path.strip().replace('wav', 'pt') for sub_path in file_list]
 
         label_list = [filepath.parent.stem for filepath in self.audio_path_list]
-        self.label_list = [constants.LABELS.index(label) for label in label_list]
+        self.label_list = [constants.LABELS.index(label) for label in label_list if label in constants.LABELS]
 
     def _load_logits(self, filepath:Path) -> torch.Tensor:
         return torch.load(filepath)
@@ -65,11 +70,10 @@ class AudioDistillDataset(Dataset):
 
     def __getitem__(self, index):
         student_input = self._load_audio_input(self.audio_path_list[index])
-        teacher_logits = self._load_logits(self.logit_path_list[index])
         label = self.label_list[index]
-
-        return {
-            "student_input": student_input,
-            "teacher_logits": teacher_logits,
-            "label": label
-        }
+        if self.logits_path:
+            teacher_logits = self._load_logits(self.logit_path_list[index])
+            output =  {'student_input': student_input, 'teacher_logits': teacher_logits, 'label': self.label_list[index]}
+        else:
+            output = {'student_input': student_input, 'label': self.label_list[index]}
+        return output
