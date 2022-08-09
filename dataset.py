@@ -2,7 +2,7 @@ import torch
 from torchaudio.datasets import SPEECHCOMMANDS
 import os
 
-from constants import LABELS, BATCH_SIZE
+from constants import BATCH_SIZE
 import constants
 from utils.model_utils import get_loader_params
 
@@ -46,13 +46,13 @@ class SubsetSC(SPEECHCOMMANDS):
 
 def label_to_index(word):
     # Return the position of the word in labels
-    return torch.tensor(LABELS.index(word))
+    return torch.tensor(constants.LABELS.index(word))
 
 
 def index_to_label(index):
     # Return the word corresponding to the index in LABELS
     # This is the inverse of label_to_index
-    return LABELS[index]
+    return constants.LABELS[index]
 
 def pad_sequence(batch):
     # Make all tensor in a batch the same length by padding with zeros
