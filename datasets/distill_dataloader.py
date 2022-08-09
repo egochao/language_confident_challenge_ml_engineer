@@ -6,10 +6,6 @@ import torch.nn.functional
 from torch.utils.data import Dataset
 import constants
 
-LABEL_LIST =  ["backward", "follow", "five", "bed", "zero", "on", "learn", "two", "house", "tree", "dog", "stop", "seven", "eight", "down", "six", "forward", "cat", "right", "visual", "four",
-    "wow", "no", "nine", "off", "three", "left", "marvin", "yes", "up", "sheila", "happy", "bird", "go", "one"
-]
-
 def _create_train_subset_file(base_path):
     with open(base_path / 'validation_list.txt', 'r') as f:
         val_list = f.readlines()
@@ -46,7 +42,7 @@ class AudioDistillDataset(Dataset):
         self.logit_path_list = [logits_path / sub_path.strip().replace('wav', 'pt') for sub_path in file_list]
 
         label_list = [filepath.parent.stem for filepath in self.audio_path_list]
-        self.label_list = [LABEL_LIST.index(label) for label in label_list]
+        self.label_list = [constants.LABELS.index(label) for label in label_list]
 
     def _load_logits(self, filepath:Path) -> torch.Tensor:
         return torch.load(filepath)
@@ -60,7 +56,9 @@ class AudioDistillDataset(Dataset):
             print(waveform.shape)
             waveform = torch.cat([waveform, torch.zeros((1 ,constants.INPUT_AUDIO_LENGTH - waveform.shape[1]))], dim=1)
             print(f"{filepath} is padded with {constants.INPUT_AUDIO_LENGTH - waveform.shape[1]} zeros")
-        return waveform, sr
+        fbank = torchaudio.compliance.kaldi.fbank(waveform, htk_compat=True, sample_frequency=sr, use_energy=False,
+                                                  window_type='hanning', num_mel_bins=128, dither=0.0, frame_shift=10)
+        return fbank, sr
 
     def __len__(self):
         return len(self.label_list)
