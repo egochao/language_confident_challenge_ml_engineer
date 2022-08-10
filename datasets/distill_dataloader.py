@@ -56,17 +56,21 @@ class AudioDistillDataset(Dataset):
     def _load_audio_input(self, filepath: Path) -> torch.Tensor:
         # modify this function for audio preprocessing
         # STFT for example
-        waveform, sr = torchaudio.load(filepath)
-        waveform = self.transform(waveform)
+        cached_spec_path = str(filepath).replace('.wav', '.pt')
+        if Path(cached_spec_path).exists():
+            return torch.load(cached_spec_path)
+        else:
+            waveform, sr = torchaudio.load(filepath)
+            waveform = self.transform(waveform)
 
-        waveform = waveform - waveform.mean()
-        fbank = torchaudio.compliance.kaldi.fbank(waveform, htk_compat=True, sample_frequency=sr, use_energy=False,
-                                                  window_type='hanning', num_mel_bins=128, dither=0.0, frame_shift=10)
+            waveform = waveform - waveform.mean()
+            fbank = torchaudio.compliance.kaldi.fbank(waveform, htk_compat=True, sample_frequency=sr, use_energy=False,
+                                                    window_type='hanning', num_mel_bins=128, dither=0.0, frame_shift=10)
 
-        fbank = self._pad_spec(fbank)
-        fbank = torch.unsqueeze(fbank, dim=0)
-
-        return fbank
+            fbank = self._pad_spec(fbank)
+            fbank = torch.unsqueeze(fbank, dim=0)
+            torch.save(fbank, cached_spec_path)
+            return fbank
 
     def _pad_spec(self, spec):
         target_length = constants.PADDED_SPEC_HEIGHTS
@@ -84,14 +88,11 @@ class AudioDistillDataset(Dataset):
         return len(self.label_list)
 
     def __getitem__(self, index):
-        # student_input = self._load_audio_input(self.audio_path_list[index])
+        student_input = self._load_audio_input(self.audio_path_list[index])
         label = self.label_list[index]
-        # if self.logits_path:
-        #     teacher_logits = self._load_logits(self.logit_path_list[index])
-        #     output =  student_input, teacher_logits, label
-        # else:
-        #     output = student_input, label
-        # return output
-
-
-        return torch.rand((1, 48, 128)), label
+        if self.logits_path:
+            teacher_logits = self._load_logits(self.logit_path_list[index])
+            output =  student_input, teacher_logits, label
+        else:
+            output = student_input, label
+        return output
