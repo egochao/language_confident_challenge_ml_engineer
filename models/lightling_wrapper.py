@@ -3,9 +3,7 @@ import torch
 import torch.nn
 import torchmetrics
 
-from torch import nn
 from torch.nn import functional as F
-from vit_pytorch import ViT
 import torch
 from torch import nn
 
@@ -51,7 +49,8 @@ class LitClassifier(pl.LightningModule):
         self.log("test_acc", self.test_acc, on_epoch=True, on_step=False)
 
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
+        optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate, weight_decay=0.0001)
+        return optimizer
 
     @staticmethod
     def add_model_specific_args(parent_parser):
