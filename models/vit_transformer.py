@@ -1,5 +1,4 @@
 import pytorch_lightning as pl
-# Pytorch modules
 import torch
 import torch.nn
 import torchmetrics
@@ -45,7 +44,7 @@ class VisionTransformer(nn.Module):
 
 
 class LitClassifier(pl.LightningModule):
-    def __init__(self, backbone, learning_rate=1e-3):
+    def __init__(self, backbone, learning_rate=1e-4):
         super().__init__()
         self.save_hyperparameters()
         self.backbone = backbone
@@ -54,7 +53,6 @@ class LitClassifier(pl.LightningModule):
         self.test_acc = torchmetrics.Accuracy()
 
     def forward(self, x):
-        # use forward for inference/predictions
         embedding = self.backbone(x)
         return embedding
 
@@ -81,7 +79,6 @@ class LitClassifier(pl.LightningModule):
         self.log('test_acc', self.test_acc, on_epoch=True, on_step=False)
 
     def configure_optimizers(self):
-        # self.hparams available because we called self.save_hyperparameters()
         return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
 
     @staticmethod

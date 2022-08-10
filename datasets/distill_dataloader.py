@@ -41,6 +41,8 @@ class AudioDistillDataset(Dataset):
             torch.save(fbank, cached_spec_path)
             return fbank
 
+    def _gen_cache_spec(self, filepath: Path):
+        pass
 
     def __len__(self):
         return len(self.list_data_label_mapping)
@@ -97,6 +99,19 @@ def _get_data_label_mapping(file_list, audios_path, logits_path) -> List[DataSam
     return list_data_label_mapping      
 
 
+def _pad_spec(spec):
+    target_length = constants.PADDED_SPEC_HEIGHTS
+    n_frames = spec.shape[0]
+    miss_match_dimension = target_length - n_frames
+    # cut and pad
+    if miss_match_dimension > 0:
+        pad = torch.nn.ZeroPad2d((0, 0, 0, miss_match_dimension))
+        spec = pad(spec)
+    elif miss_match_dimension < 0:
+        spec = spec[0:target_length, :]
+    return spec
+
+
 def _create_train_subset_file(base_path, replace_existing=True):
     train_filepath = base_path / 'train_list.txt'
 
@@ -121,15 +136,3 @@ def _create_train_subset_file(base_path, replace_existing=True):
         for line in training_list:
             f.write(f"{line}\n")
 
-
-def _pad_spec(spec):
-    target_length = constants.PADDED_SPEC_HEIGHTS
-    n_frames = spec.shape[0]
-    miss_match_dimension = target_length - n_frames
-    # cut and pad
-    if miss_match_dimension > 0:
-        pad = torch.nn.ZeroPad2d((0, 0, 0, miss_match_dimension))
-        spec = pad(spec)
-    elif miss_match_dimension < 0:
-        spec = spec[0:target_length, :]
-    return spec
