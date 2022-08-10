@@ -7,7 +7,7 @@ import constants
 from typing import Optional
 from data_objects import DataSample
 from typing import List
-
+from tqdm import tqdm
 import logging
 
 
@@ -35,6 +35,10 @@ class AudioDistillDataset(Dataset):
         self.cache_spec = cache_spec
         self.logits_path = logits_path
         self.keep_dataset_in_ram = keep_dataset_in_ram
+        self.transform = torchaudio.transforms.Resample(
+            orig_freq=constants.ORIGINAL_SAMPLE_RATE, new_freq=constants.NEW_SAMPLE_RATE
+        )
+
         subset_file = audios_path / f"{subset}_list.txt"
         if subset == "train":
             _create_train_subset_file(audios_path)
@@ -44,9 +48,6 @@ class AudioDistillDataset(Dataset):
 
         self.list_data_label_mapping = self._get_data_label_mapping(
             file_list, audios_path, logits_path
-        )
-        self.transform = torchaudio.transforms.Resample(
-            orig_freq=constants.ORIGINAL_SAMPLE_RATE, new_freq=constants.NEW_SAMPLE_RATE
         )
 
     def _get_data_label_mapping(
@@ -64,31 +65,33 @@ class AudioDistillDataset(Dataset):
         else:
             logit_path_list = [None] * len(audio_path_list)
 
+        if self.keep_dataset_in_ram:
+            cache_spec_list = [self._load_audio_input(audio_path) for audio_path in tqdm(audio_path_list)]
+        else:
+            cache_spec_list = [None] * len(audio_path_list)
+            
         list_data_label_mapping = []
-        for audio_path, label, logit_path in zip(
-            audio_path_list, label_list, logit_path_list
+        for audio_path, label, logit_path, cache_spec in zip(
+            audio_path_list, label_list, logit_path_list, cache_spec_list
         ):
             data_label_map = DataSample(
                 audio_path=audio_path,
                 label=label,
                 logit_path=logit_path,
-                cache_spec=None,
+                cache_spec=cache_spec,
             )
             list_data_label_mapping.append(data_label_map)
         return list_data_label_mapping
 
-    def _load_audio_input(self, data_sample: DataSample) -> torch.Tensor:
-        cached_spec_path = str(data_sample.audio_path).replace(".wav", ".pt")
+    def _load_audio_input(self, audio_path: Path) -> torch.Tensor:
+        cached_spec_path = str(audio_path).replace(".wav", ".pt")
         if Path(cached_spec_path).exists() and self.cache_spec:
             spec = torch.load(cached_spec_path)
         else:
-            spec = _load_audio_to_spec(data_sample.audio_path, self.transform)
+            spec = _load_audio_to_spec(audio_path, self.transform)
             torch.save(spec, cached_spec_path)
 
-        if self.keep_dataset_in_ram and data_sample.cache_spec is not None:
-            data_sample.cache_spec = spec
-
-        return spec, data_sample
+        return spec
 
     def __len__(self):
         return len(self.list_data_label_mapping)
@@ -97,16 +100,17 @@ class AudioDistillDataset(Dataset):
         data_sample = self.list_data_label_mapping[index]
         label = data_sample.label
 
-        student_input, data_sample = self._load_audio_input(data_sample)
-
+        if self.keep_dataset_in_ram and data_sample.cache_spec is not None:
+            student_input = data_sample.cache_spec 
+        else:
+            student_input = self._load_audio_input(data_sample.audio_path)
         if self.logits_path:
             teacher_logits = torch.load(data_sample.logit_path)
             output = student_input, teacher_logits, label
         else:
             output = student_input, label
-        self.list_data_label_mapping[index] = data_sample
         return output
-
+        # return torch.rand((1, 48, 128)), label
 
 def _load_audio_to_spec(filepath: Path, transform=None) -> torch.Tensor:
     waveform, sr = torchaudio.load(filepath)
@@ -163,6 +167,8 @@ def _create_train_subset_file(base_path: Path, replace_existing=True):
             all_list += file_list
 
     training_list = [x for x in all_list if x not in val_test_list]
+    if isinstance(constants.NUM_TRAIN_SAMPLE, int):
+        training_list = training_list[:constants.NUM_TRAIN_SAMPLE]
     with open(train_filepath, "w") as f:
         for line in training_list:
             f.write(f"{line}\n")
