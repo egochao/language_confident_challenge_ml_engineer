@@ -2,25 +2,25 @@ from pathlib import Path
 import torch
 from datasets.distill_dataloader import AudioDistillDataset
 import time
+from datasets.sc_dataset import SpeechCommandDataModule
+from utils.model_utils import get_loader_params
 
 audios_path = Path('data/SpeechCommands/speech_commands_v0.02/')
 logits_path = Path('data/teacher_logits')
 
-subsets = ['train', 'validation', 'testing']
-
+data_dir = './data/'
 batch_size = 256
-num_workers = 2
+num_workers, pin_memory = get_loader_params()
+data_module = SpeechCommandDataModule(data_dir, batch_size)
+data_module.prepare_data()
+data_module.setup()
 
-eval_loader = torch.utils.data.DataLoader(
-    AudioDistillDataset(audios_path, subsets[0]),
-    batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True
-)
 
 st = time.time()
-for idx, batch in enumerate(eval_loader):
+for idx, batch in enumerate(data_module.train_dataloader()):
     print(idx)
 
     print(batch[0].shape)
-    if idx > 1000:
+    if idx > 100:
         break
 print(time.time() - st)

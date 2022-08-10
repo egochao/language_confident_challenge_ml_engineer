@@ -11,7 +11,7 @@ if __name__ == '__main__':
     wandb_logger = WandbLogger(project='ViT_experiments')
 
     data_dir = './data/'
-    batch_size = 256
+    batch_size = 1028
     num_workers, pin_memory = get_loader_params()
     data_module = SpeechCommandDataModule(data_dir, batch_size)
     data_module.prepare_data()
