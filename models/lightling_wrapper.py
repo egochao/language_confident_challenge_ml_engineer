@@ -29,14 +29,14 @@ class LitClassifier(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         x, y = batch
         y_hat = self.backbone(x)
-        loss = F.cross_entropy(y_hat, y)
+        loss = F.nll_loss(y_hat, y)
         self.log("train_loss", loss, on_epoch=True, on_step=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
         x, y = batch
         y_hat = self.backbone(x)
-        loss = F.cross_entropy(y_hat, y)
+        loss = F.nll_loss(y_hat, y)
         self.val_acc(y_hat.softmax(dim=-1), y)
         metrics = {"val_acc": self.val_acc, "val_loss": loss}
         self.log_dict(metrics, on_epoch=True, on_step=False)
@@ -44,7 +44,7 @@ class LitClassifier(pl.LightningModule):
     def test_step(self, batch, batch_idx):
         x, y = batch
         y_hat = self.backbone(x)
-        loss = F.cross_entropy(y_hat, y)
+        loss = F.nll_loss(y_hat, y)
         self.test_acc(y_hat.softmax(dim=-1), y)
         self.log("test_acc", self.test_acc, on_epoch=True, on_step=False)
 

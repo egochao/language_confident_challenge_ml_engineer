@@ -1,1 +1,1 @@
-# language_confident_challenge_ml_engineer
+#### Distill state of art model https://github.com/YuanGongND/ast to a smaller model(Conv, Simple Attention) for Speech Command dataset
