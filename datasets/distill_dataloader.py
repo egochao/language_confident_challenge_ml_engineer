@@ -84,11 +84,14 @@ class AudioDistillDataset(Dataset):
         return len(self.label_list)
 
     def __getitem__(self, index):
-        student_input = self._load_audio_input(self.audio_path_list[index])
+        # student_input = self._load_audio_input(self.audio_path_list[index])
         label = self.label_list[index]
-        if self.logits_path:
-            teacher_logits = self._load_logits(self.logit_path_list[index])
-            output =  student_input, teacher_logits, label
-        else:
-            output = student_input, label
-        return output
+        # if self.logits_path:
+        #     teacher_logits = self._load_logits(self.logit_path_list[index])
+        #     output =  student_input, teacher_logits, label
+        # else:
+        #     output = student_input, label
+        # return output
+
+
+        return torch.rand((1, 48, 128)), label

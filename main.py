@@ -17,11 +17,6 @@ if __name__ == '__main__':
     data_module.prepare_data()
     data_module.setup()
 
-    # for idx, batch in enumerate(data_module.train_dataloader()):
-    #     print(idx)
-    #     # print(batch)
-    #     if idx > 1000:
-    #         break
     core_model = VisionTransformer()
     model = LitClassifier(core_model)
 

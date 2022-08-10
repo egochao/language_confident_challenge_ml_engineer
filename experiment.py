@@ -7,7 +7,7 @@ logits_path = Path('data/teacher_logits')
 
 subsets = ['train', 'validation', 'testing']
 
-batch_size = 3
+batch_size = 256
 num_workers = 2
 
 eval_loader = torch.utils.data.DataLoader(
@@ -18,6 +18,6 @@ eval_loader = torch.utils.data.DataLoader(
 for idx, batch in enumerate(eval_loader):
     print(idx)
 
-    print(batch['student_input'][0].shape)
+    print(batch[0].shape)
     if idx > 1000:
         break
