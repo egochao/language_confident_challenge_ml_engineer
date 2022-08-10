@@ -18,9 +18,9 @@ if __name__ == '__main__':
     model = LitClassifier(core_model)
 
     if torch.cuda.is_available():
-        trainer = pl.Trainer(gpus=1, max_epochs=100, logger=wandb_logger)
+        trainer = pl.Trainer(gpus=1, max_epochs=50, logger=wandb_logger)
     else:
-        trainer = pl.Trainer(max_epochs=100, logger=wandb_logger)
+        trainer = pl.Trainer(max_epochs=50, logger=wandb_logger)
 
     # train, validate
     trainer.fit(model, data_module)

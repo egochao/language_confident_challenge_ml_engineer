@@ -16,13 +16,13 @@ class VisionTransformer(nn.Module):
     def __init__(self):
         super().__init__()
         self.model = ViT(
-            image_size = 128,
+            image_size = (48, 128),
             patch_size = 16,
             num_classes = 35,
-            dim = 128,
-            depth = 4,
+            dim = 256,
+            depth = 6,
             heads = 4,
-            mlp_dim = 128,
+            mlp_dim = 256,
             channels=1,
             dropout = 0.0,
             emb_dropout = 0.0
@@ -49,6 +49,7 @@ class LitClassifier(pl.LightningModule):
         super().__init__()
         self.save_hyperparameters()
         self.backbone = backbone
+        self.learning_rate = learning_rate
         self.val_acc = torchmetrics.Accuracy()
         self.test_acc = torchmetrics.Accuracy()
 
@@ -81,7 +82,7 @@ class LitClassifier(pl.LightningModule):
 
     def configure_optimizers(self):
         # self.hparams available because we called self.save_hyperparameters()
-        return torch.optim.Adam(self.parameters(), lr=1e-4)
+        return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
 
     @staticmethod
     def add_model_specific_args(parent_parser):
