@@ -98,7 +98,6 @@ class AudioDistillDataset(Dataset):
 
     def __getitem__(self, index):
         data_sample = self.list_data_label_mapping[index]
-        label = data_sample.label
 
         if self.keep_dataset_in_ram and data_sample.cache_spec is not None:
             student_input = data_sample.cache_spec 
@@ -106,10 +105,10 @@ class AudioDistillDataset(Dataset):
             student_input = self._load_audio_input(data_sample.audio_path)
         if self.logits_path:
             teacher_logits = torch.load(data_sample.logit_path)
-            output = student_input, teacher_logits, label
+            output = student_input, teacher_logits
         else:
-            output = student_input, label
-        return output
+            output = student_input
+        return output, data_sample.label
         # return torch.rand((1, 48, 128)), label
 
 def _load_audio_to_spec(filepath: Path, transform=None) -> torch.Tensor:

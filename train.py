@@ -1,4 +1,5 @@
-from models.vit_transformer import VisionTransformer, LitClassifier
+from models.vit_transformer import VisionTransformer
+from models.lightling_wrapper import LitClassifier
 import torch
 from datasets.sc_dataset import SpeechCommandDataModule
 import pytorch_lightning as pl
