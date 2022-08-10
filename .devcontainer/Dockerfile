@@ -5,8 +5,8 @@ RUN apt-get clean \
     && apt-get install -y libsndfile1
 
 ARG USERNAME=container
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
+ARG USER_UID=1011
+ARG USER_GID=1012
 ARG WORK_DIR=/home/$USERNAME
 
 # Create the user

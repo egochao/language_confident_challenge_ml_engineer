@@ -1,6 +1,6 @@
 scipy
-torch==1.8.1
-torchaudio==0.8.1
+torch
+torchaudio
 sklearn
 plotly
 pandas
