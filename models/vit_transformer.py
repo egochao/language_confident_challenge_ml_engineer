@@ -1,6 +1,3 @@
-# Installing libraries
-# Importing
-# Weights & Biases
 import pytorch_lightning as pl
 # Pytorch modules
 import torch
@@ -9,14 +6,9 @@ import torchmetrics
 
 from torch import nn
 from torch.nn import functional as F
-from transformers import ViTConfig
 from vit_pytorch import ViT
-from vit_pytorch.vit import Transformer, pair
 import torch
 from torch import nn
-
-from einops import rearrange, repeat
-from einops.layers.torch import Rearrange
 
 from argparse import ArgumentParser
 

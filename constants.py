@@ -1,13 +1,13 @@
 from pathlib import Path
 
-BATCH_SIZE = 128
+BATCH_SIZE = 256
 ORIGINAL_SAMPLE_RATE = 16000
 PADDED_SPEC_HEIGHTS = 48
 NEW_SAMPLE_RATE = 8000
 
 DATA_DIR = Path('./data/')
 SUB_DATASET_PATH = 'SpeechCommands/speech_commands_v0.02/'
-
+KEEP_DATASET_IN_RAM = True
 
 
 LABELS = ['backward',

@@ -8,6 +8,7 @@ wandb
 data
 *core
 data/teacher_logits
+*epoch*
 
 # Environments
 .venv
