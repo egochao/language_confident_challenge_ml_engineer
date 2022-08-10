@@ -26,7 +26,7 @@ def _create_train_subset_file(base_path):
 
 
 class AudioDistillDataset(Dataset):
-    def __init__(self, audios_path: Path, subset: str, logits_path: Optional[Path] = None):
+    def __init__(self, audios_path: Path, subset: str, logits_path: Optional[Path] = None, cache_spec: bool = True):
         """Loads speech commands dataset with optional teacher model last layer logits.
 
         Args:
@@ -34,6 +34,7 @@ class AudioDistillDataset(Dataset):
             logits_path (Path): path to teacher logit
             subset (str): 'train' or 'validation' or 'testing'
         """
+        self.cache_spec = cache_spec
         self.logits_path = logits_path
         subset_file = audios_path / f'{subset}_list.txt'
         if subset == "train":
@@ -57,7 +58,7 @@ class AudioDistillDataset(Dataset):
         # modify this function for audio preprocessing
         # STFT for example
         cached_spec_path = str(filepath).replace('.wav', '.pt')
-        if Path(cached_spec_path).exists():
+        if Path(cached_spec_path).exists() and self.cache_spec:
             return torch.load(cached_spec_path)
         else:
             waveform, sr = torchaudio.load(filepath)
