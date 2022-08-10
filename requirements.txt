@@ -16,4 +16,3 @@ transformers
 vit-pytorch
 pytorch-lightning
 pydantic
-torchtext==0.8.0
