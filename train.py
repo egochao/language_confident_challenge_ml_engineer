@@ -5,13 +5,13 @@ import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pl.seed_everything(0)
-    wandb_logger = WandbLogger(project='ViT_experiments')
+    wandb_logger = WandbLogger(project="ViT_experiments")
     core_model = VisionTransformer()
     model = LitClassifier(core_model)
 
-    data_dir = './data/'
+    data_dir = "./data/"
     data_module = SpeechCommandDataModule(data_dir)
     data_module.prepare_data()
     data_module.setup()

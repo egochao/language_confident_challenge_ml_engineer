@@ -5,10 +5,10 @@ import time
 from datasets.sc_dataset import SpeechCommandDataModule
 from utils.model_utils import get_loader_params
 
-audios_path = Path('data/SpeechCommands/speech_commands_v0.02/')
-logits_path = Path('data/teacher_logits')
+audios_path = Path("data/SpeechCommands/speech_commands_v0.02/")
+logits_path = Path("data/teacher_logits")
 
-data_dir = './data/'
+data_dir = "./data/"
 batch_size = 1028
 num_workers, pin_memory = get_loader_params()
 data_module = SpeechCommandDataModule(data_dir, batch_size)

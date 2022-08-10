@@ -8,7 +8,7 @@ def get_likely_index(tensor):
     return tensor.argmax(dim=-1)
 
 
-def test(model, epoch, test_loader,  device):
+def test(model, epoch, test_loader, device):
     model.eval()
     correct = 0
     for data, target in test_loader:
@@ -21,4 +21,6 @@ def test(model, epoch, test_loader,  device):
         pred = get_likely_index(output)
         correct += number_of_correct(pred, target)
 
-    print(f"\nTest Epoch: {epoch}\tAccuracy: {correct}/{len(test_loader.dataset)} ({100. * correct / len(test_loader.dataset):.0f}%)\n")
+    print(
+        f"\nTest Epoch: {epoch}\tAccuracy: {correct}/{len(test_loader.dataset)} ({100. * correct / len(test_loader.dataset):.0f}%)\n"
+    )

@@ -11,34 +11,35 @@ from torch import nn
 
 from argparse import ArgumentParser
 
+
 class VisionTransformer(nn.Module):
     def __init__(self):
         super().__init__()
         self.model = ViT(
-            image_size = (48, 128),
-            patch_size = 16,
-            num_classes = 35,
-            dim = 256,
-            depth = 6,
-            heads = 4,
-            mlp_dim = 256,
+            image_size=(48, 128),
+            patch_size=16,
+            num_classes=35,
+            dim=256,
+            depth=6,
+            heads=4,
+            mlp_dim=256,
             channels=1,
-            dropout = 0.0,
-            emb_dropout = 0.0
+            dropout=0.0,
+            emb_dropout=0.0,
         )
-    
+
     @torch.no_grad()
     def init_weights(self):
         def _init(m):
             if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d):
                 nn.init.xavier_uniform_(m.weight)
-                if hasattr(m, 'bias') and m.bias is not None:
+                if hasattr(m, "bias") and m.bias is not None:
                     nn.init.normal_(m.bias, std=1e-6)
-            
+
         self.apply(_init)
         nn.init.constant_(self.model.fc.weight, 0)
         nn.init.constant_(self.model.fc.bias, 0)
-    
+
     def forward(self, x):
         return self.model(x)
 
@@ -60,7 +61,7 @@ class LitClassifier(pl.LightningModule):
         x, y = batch
         y_hat = self.backbone(x)
         loss = F.cross_entropy(y_hat, y)
-        self.log('train_loss', loss, on_epoch=True, on_step=True)
+        self.log("train_loss", loss, on_epoch=True, on_step=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -68,7 +69,7 @@ class LitClassifier(pl.LightningModule):
         y_hat = self.backbone(x)
         loss = F.cross_entropy(y_hat, y)
         self.val_acc(y_hat.softmax(dim=-1), y)
-        metrics = {'val_acc': self.val_acc, 'val_loss': loss}
+        metrics = {"val_acc": self.val_acc, "val_loss": loss}
         self.log_dict(metrics, on_epoch=True, on_step=False)
 
     def test_step(self, batch, batch_idx):
@@ -76,7 +77,7 @@ class LitClassifier(pl.LightningModule):
         y_hat = self.backbone(x)
         loss = F.cross_entropy(y_hat, y)
         self.test_acc(y_hat.softmax(dim=-1), y)
-        self.log('test_acc', self.test_acc, on_epoch=True, on_step=False)
+        self.log("test_acc", self.test_acc, on_epoch=True, on_step=False)
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
@@ -84,5 +85,5 @@ class LitClassifier(pl.LightningModule):
     @staticmethod
     def add_model_specific_args(parent_parser):
         parser = ArgumentParser(parents=[parent_parser], add_help=False)
-        parser.add_argument('--learning_rate', type=float, default=0.0001)
+        parser.add_argument("--learning_rate", type=float, default=0.0001)
         return parser

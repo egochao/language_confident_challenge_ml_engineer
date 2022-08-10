@@ -10,4 +10,3 @@ class DataSample(BaseModel):
 
     logit_path: Optional[Path]
     cache_spec: Optional[Any]
-    

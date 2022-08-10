@@ -42,24 +42,38 @@ class AudioDistillDataset(Dataset):
         with open(subset_file, "r") as f:
             file_list = f.readlines()
 
-        self.list_data_label_mapping = self._get_data_label_mapping(file_list, audios_path, logits_path)
+        self.list_data_label_mapping = self._get_data_label_mapping(
+            file_list, audios_path, logits_path
+        )
         self.transform = torchaudio.transforms.Resample(
             orig_freq=constants.ORIGINAL_SAMPLE_RATE, new_freq=constants.NEW_SAMPLE_RATE
         )
 
-    def _get_data_label_mapping(self, file_list: List[str], audios_path: Path, logits_path: Path) -> List[DataSample]:
+    def _get_data_label_mapping(
+        self, file_list: List[str], audios_path: Path, logits_path: Path
+    ) -> List[DataSample]:
         audio_path_list = [audios_path / sub_path.strip() for sub_path in file_list]
         label_list = [filepath.parent.stem for filepath in audio_path_list]
         label_list = [constants.LABELS.index(label) for label in label_list]
 
         if logits_path:
-            logit_path_list = [logits_path / sub_path.strip().replace("wav", "pt") for sub_path in file_list]
+            logit_path_list = [
+                logits_path / sub_path.strip().replace("wav", "pt")
+                for sub_path in file_list
+            ]
         else:
             logit_path_list = [None] * len(audio_path_list)
 
         list_data_label_mapping = []
-        for audio_path, label, logit_path in zip(audio_path_list, label_list, logit_path_list):
-            data_label_map = DataSample(audio_path=audio_path, label=label, logit_path=logit_path, cache_spec=None)
+        for audio_path, label, logit_path in zip(
+            audio_path_list, label_list, logit_path_list
+        ):
+            data_label_map = DataSample(
+                audio_path=audio_path,
+                label=label,
+                logit_path=logit_path,
+                cache_spec=None,
+            )
             list_data_label_mapping.append(data_label_map)
         return list_data_label_mapping
 

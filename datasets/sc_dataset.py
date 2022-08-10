@@ -9,7 +9,6 @@ from datasets.distill_dataloader import AudioDistillDataset
 
 
 class SpeechCommandDataModule(LightningDataModule):
-
     def __init__(self, data_dir=constants.DATA_DIR, batch_size=constants.BATCH_SIZE):
         super().__init__()
         self.batch_size = batch_size
@@ -20,28 +19,40 @@ class SpeechCommandDataModule(LightningDataModule):
         self.dataset_path = Path(data_dir).joinpath(constants.SUB_DATASET_PATH)
 
     def prepare_data(self):
-        '''called only once and on 1 GPU'''
+        """called only once and on 1 GPU"""
         # download data
         SPEECHCOMMANDS(self.data_dir, download=True)
 
-
     def train_dataloader(self):
         return torch.utils.data.DataLoader(
-        AudioDistillDataset(self.dataset_path, "train"),
-        batch_size=self.batch_size, shuffle=True, num_workers=self.num_workers, pin_memory=self.pin_memory)
-    
+            AudioDistillDataset(self.dataset_path, "train"),
+            batch_size=self.batch_size,
+            shuffle=True,
+            num_workers=self.num_workers,
+            pin_memory=self.pin_memory,
+        )
+
     def val_dataloader(self):
         return torch.utils.data.DataLoader(
-        AudioDistillDataset(self.dataset_path, "validation"),
-        batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers, pin_memory=self.pin_memory)
+            AudioDistillDataset(self.dataset_path, "validation"),
+            batch_size=self.batch_size,
+            shuffle=False,
+            num_workers=self.num_workers,
+            pin_memory=self.pin_memory,
+        )
 
     def test_dataloader(self):
         return torch.utils.data.DataLoader(
-        AudioDistillDataset(self.dataset_path, "testing"),
-        batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers, pin_memory=self.pin_memory)        
-        
-if __name__ == '__main__':
-    data_dir = './data/'
+            AudioDistillDataset(self.dataset_path, "testing"),
+            batch_size=self.batch_size,
+            shuffle=False,
+            num_workers=self.num_workers,
+            pin_memory=self.pin_memory,
+        )
+
+
+if __name__ == "__main__":
+    data_dir = "./data/"
     batch_size = 256
     num_workers, pin_memory = get_loader_params()
     data_module = SpeechCommandDataModule(data_dir, batch_size)
@@ -52,6 +63,6 @@ if __name__ == '__main__':
     test_loader = data_module.test_dataloader()
     for idx, batch in enumerate(train_loader):
         print(idx)
-        print(batch['student_input'][0].shape)
+        print(batch["student_input"][0].shape)
         if idx > 1000:
             break
