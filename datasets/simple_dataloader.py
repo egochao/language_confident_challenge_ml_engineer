@@ -3,20 +3,16 @@ import torchaudio
 from torch.utils.data import Dataset
 from data_objects import DataSample
 from typing import List
+import torch.nn.functional as F
 
 import constants
 
 class AudioDataset(Dataset):
-    def __init__(
-        self,
-        audio_folder: Path,
-        subset: str,
-    ):
+    def __init__(self, audio_folder: Path, subset: str):
         """Loads speech commands dataset with optional teacher model last layer logits.
 
         Args:
             audios_folder (Path): path to speech command dataset
-            logits_path (Path): path to teacher logit
             subset (str): 'train' or 'validation' or 'testing'
         """
         audio_folder = audio_folder.joinpath(constants.SUB_DATASET_PATH)
@@ -54,8 +50,10 @@ class AudioDataset(Dataset):
         return list_data_label_mapping
 
     def load_train_input(self, data_sample: DataSample):
-        waveform, sr = torchaudio.load(data_sample.audio_path)
+        waveform, _ = torchaudio.load(data_sample.audio_path)
         waveform = self.transform(waveform)
+        pad_length = constants.FIX_PAD_AUDIO_LENGTH - waveform.shape[1]
+        waveform = F.pad(input=waveform, pad=(0, pad_length), mode='constant', value=0)
         return waveform
 
     def __len__(self):

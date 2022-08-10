@@ -7,6 +7,3 @@ from pydantic import BaseModel
 class DataSample(BaseModel):
     audio_path: Path
     label: int
-
-    logit_path: Optional[Path]
-    cache_spec: Optional[Any]

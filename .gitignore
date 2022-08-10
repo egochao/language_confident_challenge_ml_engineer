@@ -10,6 +10,7 @@ data
 data/teacher_logits
 *epoch*
 ViT_experiments
+Untitled*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
