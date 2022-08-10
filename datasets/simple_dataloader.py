@@ -1,3 +1,4 @@
+import torch
 from pathlib import Path
 import torchaudio
 from torch.utils.data import Dataset
@@ -54,6 +55,7 @@ class AudioDataset(Dataset):
         waveform = self.transform(waveform)
         pad_length = constants.FIX_PAD_AUDIO_LENGTH - waveform.shape[1]
         waveform = F.pad(input=waveform, pad=(0, pad_length), mode='constant', value=0)
+        # waveform = torch.squeeze(waveform)
         return waveform
 
     def __len__(self):

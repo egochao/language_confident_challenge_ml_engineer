@@ -1,9 +1,11 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
+import torch
+import constants
 
 class SimpleConv(nn.Module):
-    def __init__(self, n_input=1, n_output=35, stride=16, n_channel=32):
+    def __init__(self, n_input=1, n_output=len(constants.LABELS), stride=16, n_channel=1):
         super().__init__()
         self.conv1 = nn.Conv1d(n_input, n_channel, kernel_size=80, stride=stride)
         self.bn1 = nn.BatchNorm1d(n_channel)
@@ -35,4 +37,6 @@ class SimpleConv(nn.Module):
         x = F.avg_pool1d(x, x.shape[-1])
         x = x.permute(0, 2, 1)
         x = self.fc1(x)
-        return F.log_softmax(x, dim=2)
+        x = torch.squeeze(x) 
+        return x
+        # return F.log_softmax(x, dim=2)
