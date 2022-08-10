@@ -11,6 +11,8 @@ from torch import nn
 
 from argparse import ArgumentParser
 
+import constants
+
 
 class VisionTransformer(nn.Module):
     def __init__(self):
@@ -45,7 +47,7 @@ class VisionTransformer(nn.Module):
 
 
 class LitClassifier(pl.LightningModule):
-    def __init__(self, backbone, learning_rate=1e-4):
+    def __init__(self, backbone, learning_rate=constants.LEARNING_RATE):
         super().__init__()
         self.save_hyperparameters()
         self.backbone = backbone
