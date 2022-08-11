@@ -6,7 +6,7 @@ from datasets.sc_dataset import SpeechCommandDataModule
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
 from datasets.simple_dataloader import AudioDataset
-from datasets.prebuild_dataset import SubsetSC
+from datasets.prebuild_dataset import AudioArrayDataSet
 
 
 from pathlib import Path
@@ -19,7 +19,7 @@ if __name__ == "__main__":
     model = LitClassifier(core_model)
 
     data_dir = Path("./data/")
-    data_module = SpeechCommandDataModule(SubsetSC, data_dir)
+    data_module = SpeechCommandDataModule(AudioArrayDataSet, data_dir)
     data_module.prepare_data()
     data_module.setup()
 

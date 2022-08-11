@@ -3,7 +3,7 @@ import os
 import constants
 from pathlib import Path
 
-class SubsetSC(SPEECHCOMMANDS):
+class AudioArrayDataSet(SPEECHCOMMANDS):
     def __init__(self, data_dir: Path = constants.DATA_DIR , subset: str = None):
         super().__init__(data_dir)
 
