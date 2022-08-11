@@ -22,8 +22,8 @@ if __name__ == "__main__":
     data_module.setup()
 
     if torch.cuda.is_available():
-        trainer = pl.Trainer(gpus=1, max_epochs=50, logger=wandb_logger)
+        trainer = pl.Trainer(gpus=1, max_epochs=80, logger=wandb_logger)
     else:
-        trainer = pl.Trainer(max_epochs=50, logger=wandb_logger)
+        trainer = pl.Trainer(max_epochs=80, logger=wandb_logger)
 
     trainer.fit(model, data_module)

@@ -14,11 +14,12 @@ if __name__ == "__main__":
     wandb_logger = WandbLogger(project="ViT_experiments")
     loss_fn = torch.nn.BCEWithLogitsLoss()
     model = BaseTorchLightlingWrapper(
-        core_model=core_model, 
-        loss_fn=loss_fn, 
-        label_converter=one_hot_to_index)
+        core_model=core_model, loss_fn=loss_fn, label_converter=one_hot_to_index
+    )
 
-    data_module = SpeechCommandDataModule(AudioArrayDataSet, spec_collate_fn, batch_size=64)
+    data_module = SpeechCommandDataModule(
+        AudioArrayDataSet, spec_collate_fn, batch_size=64
+    )
     data_module.prepare_data()
     data_module.setup()
 

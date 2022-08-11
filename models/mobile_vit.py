@@ -33,11 +33,15 @@ def label_to_index(word):
     # Return the position of the word in labels
     return LABELS.index(word)
 
+
 def one_hot_to_index(one_hot_labels):
     index_labels = torch.argmax(one_hot_labels, dim=1)
     return index_labels
 
+
 import numpy as np
+
+
 def spec_collate_fn(batch):
     tensors_input, labels = [], []
 

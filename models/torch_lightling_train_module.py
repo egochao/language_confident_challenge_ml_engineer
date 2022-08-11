@@ -8,12 +8,12 @@ import constants
 
 
 class BaseTorchLightlingWrapper(pl.LightningModule):
-    def __init__(self, core_model, loss_fn , label_converter = None, learning_rate=constants.LEARNING_RATE):
+    def __init__(self, core_model, loss_fn, label_converter=None, learning_rate=None):
         super().__init__()
 
         # log hyperparameters
         self.save_hyperparameters()
-        self.learning_rate = learning_rate
+        self.learning_rate = learning_rate or constants.LEARNING_RATE
         self.core_model = core_model
         self.loss_fn = loss_fn
         self.acc = Accuracy()
@@ -71,6 +71,6 @@ class BaseTorchLightlingWrapper(pl.LightningModule):
             self.parameters(), lr=self.learning_rate, weight_decay=0.0001
         )
         scheduler = torch.optim.lr_scheduler.StepLR(
-            optimizer, step_size=20, gamma=0.1
+            optimizer, step_size=10, gamma=0.1
         )  # reduce the learning after 20 epochs by a factor of 10
         return [optimizer], [scheduler]
