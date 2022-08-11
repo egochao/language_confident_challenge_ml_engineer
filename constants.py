@@ -13,6 +13,9 @@ LEARNING_RATE = 1e-2
 
 NUM_TRAIN_SAMPLE = 50000
 
+NUM_WORKERS = 2
+PIN_MEMORY = True
+
 LABELS = [
     "backward",
     "follow",

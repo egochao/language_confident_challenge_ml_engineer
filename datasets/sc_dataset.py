@@ -4,8 +4,9 @@ from pytorch_lightning import LightningDataModule
 from pytorch_lightning import LightningDataModule
 import constants
 from utils.model_utils import get_loader_params
-
+from constants import LABELS
 from datasets.simple_dataloader import AudioDataset
+
 
 class SpeechCommandDataModule(LightningDataModule):
     def __init__(self, dataset: AudioDataset, data_dir=constants.DATA_DIR, batch_size=constants.BATCH_SIZE):
@@ -62,7 +63,7 @@ def pad_sequence(batch):
 
 def label_to_index(word):
     # Return the position of the word in labels
-    return torch.tensor(constants.LABELS.index(word))
+    return torch.tensor(LABELS.index(word))
 
 
 def collate_fn(batch):
