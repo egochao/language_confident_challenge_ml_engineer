@@ -31,17 +31,23 @@ def pad_sequence(batch):
 
 def label_to_index(word):
     # Return the position of the word in labels
-    return torch.tensor(LABELS.index(word))
+    return LABELS.index(word)
 
+def one_hot_to_index(one_hot_labels):
+    index_labels = torch.argmax(one_hot_labels, dim=1)
+    return index_labels
 
+import numpy as np
 def spec_collate_fn(batch):
-    tensors, targets = [], []
+    tensors_input, labels = [], []
 
     for waveform, _, label, *_ in batch:
-        tensors += [waveform]
-        targets += [label_to_index(label)]
+        tensors_input += [waveform]
+        labels += [label_to_index(label)]
 
-    tensors = pad_sequence(tensors)
-    targets = torch.stack(targets)
+    tensors_input = pad_sequence(tensors_input)
 
-    return tensors, targets
+    one_hot_targets = np.eye(len(LABELS))[labels]
+    tensor_labels = torch.tensor(one_hot_targets, dtype=torch.float)
+
+    return tensors_input, tensor_labels

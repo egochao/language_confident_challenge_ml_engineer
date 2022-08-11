@@ -4,7 +4,7 @@ from datasets.torch_lightling_datamodule import SpeechCommandDataModule
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
 from datasets.base_dataset import AudioArrayDataSet
-from models.mobile_vit import MobileViTModelCustom, spec_collate_fn
+from models.mobile_vit import MobileViTModelCustom, spec_collate_fn, one_hot_to_index
 
 
 if __name__ == "__main__":
@@ -12,7 +12,11 @@ if __name__ == "__main__":
 
     pl.seed_everything(0)
     wandb_logger = WandbLogger(project="ViT_experiments")
-    model = BaseTorchLightlingWrapper(core_model)
+    loss_fn = torch.nn.BCEWithLogitsLoss()
+    model = BaseTorchLightlingWrapper(
+        core_model=core_model, 
+        loss_fn=loss_fn, 
+        label_converter=one_hot_to_index)
 
     data_module = SpeechCommandDataModule(AudioArrayDataSet, spec_collate_fn, batch_size=64)
     data_module.prepare_data()

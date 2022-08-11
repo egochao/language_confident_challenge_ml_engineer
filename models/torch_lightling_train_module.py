@@ -3,34 +3,40 @@ import torch
 import torch.nn
 from torchmetrics import Accuracy
 
-from torch.nn import functional as F
 import torch
 import constants
 
 
 class BaseTorchLightlingWrapper(pl.LightningModule):
-    def __init__(self, core_model, loss_fn ,learning_rate=constants.LEARNING_RATE):
+    def __init__(self, core_model, loss_fn , label_converter = None, learning_rate=constants.LEARNING_RATE):
         super().__init__()
 
         # log hyperparameters
         self.save_hyperparameters()
         self.learning_rate = learning_rate
         self.core_model = core_model
-        self.accuracy = Accuracy()
+        self.loss_fn = loss_fn
+        self.acc = Accuracy()
+        self.label_converter = label_converter
 
     # will be used during inference
     def forward(self, x):
         embedding = self.core_model(x)
         return embedding
 
+    def _metric(self, preds, y):
+        if self.label_converter is not None:
+            y = self.label_converter(y)
+        return self.acc(preds, y)
+
     def training_step(self, batch, batch_idx):
         x, y = batch
         logits = self(x)
-        loss = F.nll_loss(logits, y)
+        loss = self.loss_fn(logits, y)
 
         # training metrics
         preds = torch.argmax(logits, dim=1)
-        acc = self.accuracy(preds, y)
+        acc = self._metric(preds, y)
         self.log("train_loss", loss, on_step=True, on_epoch=True, logger=True)
         self.log("train_acc", acc, on_step=True, on_epoch=True, logger=True)
 
@@ -39,11 +45,11 @@ class BaseTorchLightlingWrapper(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         x, y = batch
         logits = self(x)
-        loss = F.nll_loss(logits, y)
+        loss = self.loss_fn(logits, y)
 
         # validation metrics
         preds = torch.argmax(logits, dim=1)
-        acc = self.accuracy(preds, y)
+        acc = self._metric(preds, y)
         self.log("val_loss", loss, prog_bar=True)
         self.log("val_acc", acc, prog_bar=True)
         return loss
@@ -51,11 +57,11 @@ class BaseTorchLightlingWrapper(pl.LightningModule):
     def test_step(self, batch, batch_idx):
         x, y = batch
         logits = self(x)
-        loss = F.nll_loss(logits, y)
+        loss = self.loss_fn(logits, y)
 
         # validation metrics
         preds = torch.argmax(logits, dim=1)
-        acc = self.accuracy(preds, y)
+        acc = self._metric(preds, y)
         self.log("test_loss", loss, prog_bar=True)
         self.log("test_acc", acc, prog_bar=True)
         return loss
