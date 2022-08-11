@@ -1,11 +1,9 @@
-from models.vit_transformer import VisionTransformer
 from models.torch_lightling_train_module import BaseTorchLightlingWrapper
 from models.simple_conv import SimpleConv
 import torch
 from datasets.torch_lightling_datamodule import SpeechCommandDataModule
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
-from datasets.simple_dataloader import AudioDataset
 from datasets.prebuild_dataset import AudioArrayDataSet
 from models.simple_conv import simconv_collate_fn
 
@@ -26,5 +24,4 @@ if __name__ == "__main__":
     else:
         trainer = pl.Trainer(max_epochs=50, logger=wandb_logger)
 
-    # train, validate
     trainer.fit(model, data_module)
