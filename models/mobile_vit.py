@@ -29,18 +29,14 @@ def label_to_index(word):
     return torch.tensor(LABELS.index(word))
 
 
-def simconv_collate_fn(batch):
+def spec_collate_fn(batch):
     tensors, targets = [], []
 
     for waveform, _, label, *_ in batch:
         tensors += [waveform]
         targets += [label_to_index(label)]
 
-
-
-    # Group the list of tensors into a batched tensor
     tensors = pad_sequence(tensors)
     targets = torch.stack(targets)
-    print(tensors.shape)
 
     return tensors, targets
