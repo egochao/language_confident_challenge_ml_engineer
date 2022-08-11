@@ -1,16 +1,14 @@
 from models.vit_transformer import VisionTransformer
-from models.lightling_wrapper import BaseTorchLightlingWrapper
+from models.torch_lightling_train_module import BaseTorchLightlingWrapper
 from models.simple_conv import SimpleConv
 import torch
-from datasets.sc_dataset import SpeechCommandDataModule
+from datasets.torch_lightling_datamodule import SpeechCommandDataModule
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
 from datasets.simple_dataloader import AudioDataset
 from datasets.prebuild_dataset import AudioArrayDataSet
 from models.simple_conv import simconv_collate_fn
 
-
-from pathlib import Path
 
 if __name__ == "__main__":
     core_model = SimpleConv()
