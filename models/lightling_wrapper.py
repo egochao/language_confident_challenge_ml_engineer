@@ -11,7 +11,7 @@ from torch import nn
 from argparse import ArgumentParser
 
 import constants
-
+import torchaudio
 
 class BaseTorchLightlingWrapper(pl.LightningModule):
     def __init__(self, core_model, learning_rate=constants.LEARNING_RATE):
@@ -22,7 +22,8 @@ class BaseTorchLightlingWrapper(pl.LightningModule):
         self.learning_rate = learning_rate
         self.core_model = core_model
         self.accuracy = Accuracy()
-    
+        self.transform = torchaudio.transforms.Resample(orig_freq=constants.ORIGINAL_SAMPLE_RATE, new_freq=constants.NEW_SAMPLE_RATE)
+
     # will be used during inference
     def forward(self, x):
         embedding = self.core_model(x)
@@ -31,6 +32,7 @@ class BaseTorchLightlingWrapper(pl.LightningModule):
     
     def training_step(self, batch, batch_idx):
         x, y = batch
+        x = self.transform(x)
         logits = self(x)
         loss = F.nll_loss(logits, y)
         
@@ -44,6 +46,7 @@ class BaseTorchLightlingWrapper(pl.LightningModule):
     
     def validation_step(self, batch, batch_idx):
         x, y = batch
+        x = self.transform(x)
         logits = self(x)
         loss = F.nll_loss(logits, y)
 
@@ -56,6 +59,7 @@ class BaseTorchLightlingWrapper(pl.LightningModule):
     
     def test_step(self, batch, batch_idx):
         x, y = batch
+        x = self.transform(x)
         logits = self(x)
         loss = F.nll_loss(logits, y)
         
@@ -67,5 +71,5 @@ class BaseTorchLightlingWrapper(pl.LightningModule):
         return loss
     
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
+        optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate, weight_decay=0.0001)
         return optimizer

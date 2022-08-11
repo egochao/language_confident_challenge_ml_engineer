@@ -2,8 +2,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 import torch
-import constants
-from constants import BATCH_SIZE, NUM_WORKERS, PIN_MEMORY, LABELS
+from constants import LABELS
 
 class SimpleConv(nn.Module):
     def __init__(self, n_input=1, n_output=35, stride=16, n_channel=32):

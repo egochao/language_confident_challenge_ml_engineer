@@ -10,11 +10,10 @@ from models.simple_conv import simconv_collate_fn
 import torch.nn.functional as F
 
 from models.simple_conv import SimpleConv
-dm = SpeechCommandDataModule(AudioArrayDataSet, simconv_collate_fn)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(device)
 
+dm = SpeechCommandDataModule(AudioArrayDataSet, simconv_collate_fn)
 
 train_loader = dm.train_dataloader()
 test_loader = dm.test_dataloader()
@@ -91,8 +90,6 @@ def test(model, epoch):
 for ten epochs then reduce the learn rate and train for ten more epochs.
 The network will be tested after each epoch to see how the accuracy
 varies during the training.
-
-
 
 """
 
