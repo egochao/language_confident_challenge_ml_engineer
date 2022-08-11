@@ -4,7 +4,7 @@ import constants
 from pathlib import Path
 
 class AudioArrayDataSet(SPEECHCOMMANDS):
-    def __init__(self, data_dir: Path = constants.DATA_DIR , subset: str = None):
+    def __init__(self, subset: str = None, data_dir: Path = constants.DATA_DIR ):
         super().__init__(data_dir)
 
         def load_list(filename):
