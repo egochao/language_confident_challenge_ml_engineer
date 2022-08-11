@@ -8,7 +8,7 @@ from transformers import MobileViTConfig, MobileViTForImageClassification
 
 
 class MobileViTModelCustom(nn.Module):
-    def __init__(self, num_labels=35, image_size=(257, 63), num_channels=1):
+    def __init__(self, num_labels=35, image_size=(513, 32), num_channels=1):
         super().__init__()
         self.configuration = MobileViTConfig(
             num_labels=35, num_channels=num_channels, image_size=image_size
@@ -19,7 +19,7 @@ class MobileViTModelCustom(nn.Module):
         return self.model(x).logits
 
 
-transform = torchaudio.transforms.Spectrogram(n_fft=512, hop_length=256)
+transform = torchaudio.transforms.Spectrogram(n_fft=1024, hop_length=512)
 
 
 def pad_sequence(batch):

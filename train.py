@@ -6,6 +6,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
 from datasets.base_dataset import AudioArrayDataSet
 from models.simple_conv import simconv_collate_fn
+from torch.nn import functional as F
 
 
 if __name__ == "__main__":
@@ -13,7 +14,8 @@ if __name__ == "__main__":
 
     pl.seed_everything(0)
     wandb_logger = WandbLogger(project="ViT_experiments")
-    model = BaseTorchLightlingWrapper(core_model)
+    loss_fn = F.nll_loss
+    model = BaseTorchLightlingWrapper(core_model, loss_fn)
 
     data_module = SpeechCommandDataModule(AudioArrayDataSet, simconv_collate_fn)
     data_module.prepare_data()

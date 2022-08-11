@@ -6,11 +6,10 @@ from torchmetrics import Accuracy
 from torch.nn import functional as F
 import torch
 import constants
-import torchaudio
 
 
 class BaseTorchLightlingWrapper(pl.LightningModule):
-    def __init__(self, core_model, learning_rate=constants.LEARNING_RATE):
+    def __init__(self, core_model, loss_fn ,learning_rate=constants.LEARNING_RATE):
         super().__init__()
 
         # log hyperparameters
