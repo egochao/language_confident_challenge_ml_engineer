@@ -6,23 +6,28 @@ from constants import LABELS
 
 from transformers import MobileViTConfig, MobileViTForImageClassification
 
+
 class MobileViTModelCustom(nn.Module):
-    def __init__(self, num_labels=35, image_size=(257,63), num_channels=1):
+    def __init__(self, num_labels=35, image_size=(257, 63), num_channels=1):
         super().__init__()
-        self.configuration = MobileViTConfig(num_labels=35, num_channels=num_channels, image_size=image_size)
+        self.configuration = MobileViTConfig(
+            num_labels=35, num_channels=num_channels, image_size=image_size
+        )
         self.model = MobileViTForImageClassification(self.configuration)
 
     def forward(self, x):
         return self.model(x).logits
-        
+
 
 transform = torchaudio.transforms.Spectrogram(n_fft=512, hop_length=256)
 
+
 def pad_sequence(batch):
     batch = [item.t() for item in batch]
-    batch = torch.nn.utils.rnn.pad_sequence(batch, batch_first=True, padding_value=0.)
+    batch = torch.nn.utils.rnn.pad_sequence(batch, batch_first=True, padding_value=0.0)
     batch = transform(batch.squeeze())
     return batch.unsqueeze(1)
+
 
 def label_to_index(word):
     # Return the position of the word in labels

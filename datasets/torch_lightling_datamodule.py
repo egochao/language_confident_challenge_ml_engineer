@@ -7,8 +7,15 @@ from constants import NUM_WORKERS, PIN_MEMORY
 from datasets.prebuild_dataset import AudioArrayDataSet
 from typing import Callable, Optional
 
+
 class SpeechCommandDataModule(LightningDataModule):
-    def __init__(self, dataset: AudioArrayDataSet, collate_fn: Optional[Callable], data_dir= None, batch_size=None):
+    def __init__(
+        self,
+        dataset: AudioArrayDataSet,
+        collate_fn: Optional[Callable],
+        data_dir=None,
+        batch_size=None,
+    ):
         super().__init__()
         self.dataset_obj = dataset
         self.collate_fn = collate_fn

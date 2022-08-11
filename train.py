@@ -4,7 +4,7 @@ import torch
 from datasets.torch_lightling_datamodule import SpeechCommandDataModule
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
-from datasets.prebuild_dataset import AudioArrayDataSet
+from datasets.base_dataset import AudioArrayDataSet
 from models.simple_conv import simconv_collate_fn
 
 

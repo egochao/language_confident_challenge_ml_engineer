@@ -3,14 +3,18 @@ import os
 import constants
 from pathlib import Path
 
+
 class AudioArrayDataSet(SPEECHCOMMANDS):
-    def __init__(self, subset: str = None, data_dir: Path = constants.DATA_DIR ):
+    def __init__(self, subset: str = None, data_dir: Path = constants.DATA_DIR):
         super().__init__(data_dir)
 
         def load_list(filename):
             filepath = os.path.join(self._path, filename)
             with open(filepath) as fileobj:
-                return [os.path.normpath(os.path.join(self._path, line.strip())) for line in fileobj]
+                return [
+                    os.path.normpath(os.path.join(self._path, line.strip()))
+                    for line in fileobj
+                ]
 
         if subset == "validation":
             self._walker = load_list("validation_list.txt")
