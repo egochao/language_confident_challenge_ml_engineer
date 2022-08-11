@@ -4,7 +4,7 @@ from pytorch_lightning import LightningDataModule
 from pytorch_lightning import LightningDataModule
 import constants
 from constants import NUM_WORKERS, PIN_MEMORY
-from datasets.prebuild_dataset import AudioArrayDataSet
+from datasets.base_dataset import AudioArrayDataSet
 from typing import Callable, Optional
 
 

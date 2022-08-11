@@ -18,9 +18,6 @@ class BaseTorchLightlingWrapper(pl.LightningModule):
         self.learning_rate = learning_rate
         self.core_model = core_model
         self.accuracy = Accuracy()
-        self.transform = torchaudio.transforms.Resample(
-            orig_freq=constants.ORIGINAL_SAMPLE_RATE, new_freq=constants.NEW_SAMPLE_RATE
-        )
 
     # will be used during inference
     def forward(self, x):
@@ -29,7 +26,6 @@ class BaseTorchLightlingWrapper(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         x, y = batch
-        x = self.transform(x)
         logits = self(x)
         loss = F.nll_loss(logits, y)
 
@@ -43,7 +39,6 @@ class BaseTorchLightlingWrapper(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         x, y = batch
-        x = self.transform(x)
         logits = self(x)
         loss = F.nll_loss(logits, y)
 
@@ -56,7 +51,6 @@ class BaseTorchLightlingWrapper(pl.LightningModule):
 
     def test_step(self, batch, batch_idx):
         x, y = batch
-        x = self.transform(x)
         logits = self(x)
         loss = F.nll_loss(logits, y)
 

@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torch.nn.functional as F
-
+import torchaudio
+import constants
 import torch
 from constants import LABELS
 
@@ -41,11 +42,18 @@ class SimpleConv(nn.Module):
         return F.log_softmax(x, dim=2).squeeze()
 
 
+transform = torchaudio.transforms.Resample(
+    orig_freq=constants.ORIGINAL_SAMPLE_RATE, new_freq=constants.NEW_SAMPLE_RATE
+)
+
+
 def pad_sequence(batch):
     # Make all tensor in a batch the same length by padding with zeros
     batch = [item.t() for item in batch]
     batch = torch.nn.utils.rnn.pad_sequence(batch, batch_first=True, padding_value=0.0)
-    return batch.permute(0, 2, 1)
+    batch = transform(batch.squeeze())
+    return batch.unsqueeze(1)
+    # return batch.permute(0, 2, 1)
 
 
 def label_to_index(word):
