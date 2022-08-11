@@ -11,7 +11,7 @@ class MobileViTModelCustom(nn.Module):
     def __init__(self, num_labels=35, image_size=(513, 32), num_channels=1):
         super().__init__()
         self.configuration = MobileViTConfig(
-            num_labels=35, num_channels=num_channels, image_size=image_size
+            num_labels=num_labels, num_channels=num_channels, image_size=image_size
         )
         self.model = MobileViTForImageClassification(self.configuration)
 
