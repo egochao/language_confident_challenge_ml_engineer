@@ -5,17 +5,17 @@ from pytorch_lightning import LightningDataModule
 import constants
 from constants import LABELS, NUM_WORKERS, PIN_MEMORY
 from datasets.simple_dataloader import AudioDataset
-
+from typing import Callable, Optional
 
 class SpeechCommandDataModule(LightningDataModule):
-    def __init__(self, dataset: AudioDataset, data_dir=constants.DATA_DIR, batch_size=constants.BATCH_SIZE):
+    def __init__(self, dataset: AudioDataset, collate_fn: Optional[Callable], data_dir= None, batch_size=None):
         super().__init__()
         self.dataset_obj = dataset
-        self.data_dir = data_dir
-        self.batch_size = batch_size
+        self.collate_fn = collate_fn
+        self.data_dir = data_dir or constants.DATA_DIR
+        self.batch_size = batch_size or constants.BATCH_SIZE
         self.num_workers = NUM_WORKERS
         self.pin_memory = PIN_MEMORY
-        self.data_dir = data_dir
 
     def prepare_data(self):
         """called only once and on 1 GPU"""
@@ -27,7 +27,7 @@ class SpeechCommandDataModule(LightningDataModule):
             self.dataset_obj(self.data_dir, "train"),
             batch_size=self.batch_size,
             shuffle=True,
-            collate_fn=collate_fn,
+            collate_fn=self.collate_fn,
             num_workers=self.num_workers,
             pin_memory=self.pin_memory,
         )
@@ -37,7 +37,7 @@ class SpeechCommandDataModule(LightningDataModule):
             self.dataset_obj(self.data_dir, "validation"),
             batch_size=self.batch_size,
             shuffle=False,
-            collate_fn=collate_fn,
+            collate_fn=self.collate_fn,
             num_workers=self.num_workers,
             pin_memory=self.pin_memory,
         )
@@ -47,37 +47,7 @@ class SpeechCommandDataModule(LightningDataModule):
             self.dataset_obj(self.data_dir, "testing"),
             batch_size=self.batch_size,
             shuffle=False,
-            collate_fn=collate_fn,
+            collate_fn=self.collate_fn,
             num_workers=self.num_workers,
             pin_memory=self.pin_memory,
         )
-
-
-def pad_sequence(batch):
-    # Make all tensor in a batch the same length by padding with zeros
-    batch = [item.t() for item in batch]
-    batch = torch.nn.utils.rnn.pad_sequence(batch, batch_first=True, padding_value=0.)
-    return batch.permute(0, 2, 1)
-
-def label_to_index(word):
-    # Return the position of the word in labels
-    return torch.tensor(LABELS.index(word))
-
-
-def collate_fn(batch):
-
-    # A data tuple has the form:
-    # waveform, sample_rate, label, speaker_id, utterance_number
-
-    tensors, targets = [], []
-
-    # Gather in lists, and encode labels as indices
-    for waveform, _, label, *_ in batch:
-        tensors += [waveform]
-        targets += [label_to_index(label)]
-
-    # Group the list of tensors into a batched tensor
-    tensors = pad_sequence(tensors)
-    targets = torch.stack(targets)
-
-    return tensors, targets
