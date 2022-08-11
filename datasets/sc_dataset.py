@@ -3,8 +3,7 @@ from torchaudio.datasets import SPEECHCOMMANDS
 from pytorch_lightning import LightningDataModule
 from pytorch_lightning import LightningDataModule
 import constants
-from utils.model_utils import get_loader_params
-from constants import LABELS
+from constants import LABELS, NUM_WORKERS, PIN_MEMORY
 from datasets.simple_dataloader import AudioDataset
 
 
@@ -14,9 +13,8 @@ class SpeechCommandDataModule(LightningDataModule):
         self.dataset_obj = dataset
         self.data_dir = data_dir
         self.batch_size = batch_size
-        num_workers, pin_memory = get_loader_params()
-        self.num_workers = num_workers
-        self.pin_memory = pin_memory
+        self.num_workers = NUM_WORKERS
+        self.pin_memory = PIN_MEMORY
         self.data_dir = data_dir
 
     def prepare_data(self):
