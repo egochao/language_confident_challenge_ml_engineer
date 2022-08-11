@@ -1,4 +1,5 @@
 import torch
+from torch import nn, optim
 import torchaudio
 from tqdm import tqdm
 from constants import BATCH_SIZE, NUM_WORKERS, PIN_MEMORY, LABELS
@@ -16,6 +17,8 @@ from models.simple_conv import SimpleConv
 #         # print(da)
 #         break
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
 
 
 train_set = AudioArrayDataSet("train")
@@ -43,19 +46,45 @@ test_loader = torch.utils.data.DataLoader(
 #         # print(da)
 #         break
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = SimpleConv()
-model.to(device)
-# print(model)
-
 transform = torchaudio.transforms.Resample(orig_freq=16000, new_freq=8000)
-transform = transform.to(device)
 
 
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=0.0001)
-scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.1)  # reduce the learning after 20 epochs by a factor of 10
+model = SimpleConv(n_input=1, n_output=len(LABELS))
+model.to(device)
+print(model)
 
 
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+
+n = count_parameters(model)
+print("Number of parameters: %s" % n)
+
+"""We will use the same optimization technique used in the paper, an Adam
+optimizer with weight decay set to 0.0001. At first, we will train with
+a learning rate of 0.01, but we will use a ``scheduler`` to decrease it
+to 0.001 during training after 20 epochs.
+
+
+
+"""
+
+optimizer = optim.Adam(model.parameters(), lr=0.01, weight_decay=0.0001)
+scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.1)  # reduce the learning after 20 epochs by a factor of 10
+
+"""Training and Testing the Network
+--------------------------------
+
+Now let’s define a training function that will feed our training data
+into the model and perform the backward pass and optimization steps. For
+training, the loss we will use is the negative log-likelihood. The
+network will then be tested after each epoch to see how the accuracy
+varies during the training.
+
+
+
+"""
 
 def train(model, epoch, log_interval):
     model.train()
@@ -69,7 +98,7 @@ def train(model, epoch, log_interval):
         output = model(data)
 
         # negative log-likelihood for a tensor of size (batch x 1 x n_output)
-        loss = F.nll_loss(output.squeeze(), target)
+        loss = F.nll_loss(output, target)
 
         optimizer.zero_grad()
         loss.backward()
@@ -83,7 +112,6 @@ def train(model, epoch, log_interval):
         pbar.update(pbar_update)
         # record loss
         losses.append(loss.item())
-
 
 
 def number_of_correct(pred, target):
@@ -116,6 +144,14 @@ def test(model, epoch):
 
     print(f"\nTest Epoch: {epoch}\tAccuracy: {correct}/{len(test_loader.dataset)} ({100. * correct / len(test_loader.dataset):.0f}%)\n")
 
+"""Finally, we can train and test the network. We will train the network
+for ten epochs then reduce the learn rate and train for ten more epochs.
+The network will be tested after each epoch to see how the accuracy
+varies during the training.
+
+
+
+"""
 
 log_interval = 20
 n_epoch = 2
