@@ -8,10 +8,22 @@ from transformers import MobileViTConfig, MobileViTForImageClassification
 
 
 class MobileViTModelCustom(nn.Module):
-    def __init__(self, num_labels=35, image_size=(513, 32), num_channels=1):
+    def __init__(self, 
+        num_labels=35, 
+        image_size=(513, 32), 
+        num_channels=1
+        ):
         super().__init__()
         self.configuration = MobileViTConfig(
-            num_labels=num_labels, num_channels=num_channels, image_size=image_size
+            num_labels=num_labels, 
+            num_channels=num_channels, 
+            image_size=image_size,
+            hidden_sizes=[144, 192, 240],
+            neck_hidden_sizes=[16, 32, 64, 96],
+            num_attention_heads=2,
+            hidden_dropout_prob=0.2,
+            attention_probs_dropout_prob=0.1,
+            classifier_dropout_prob=0.2
         )
         self.model = MobileViTForImageClassification(self.configuration)
 
