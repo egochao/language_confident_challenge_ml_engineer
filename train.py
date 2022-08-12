@@ -1,5 +1,6 @@
 from models.torch_lightling_train_module import BaseTorchLightlingWrapper
-from models.simple_conv import SimpleConv, SimpleConvNew
+from models.simple_conv import SimpleConv
+from models.new_conv import SimpleConvNew
 import torch
 from datasets.torch_lightling_datamodule import SpeechCommandDataModule
 import pytorch_lightning as pl

@@ -5,8 +5,7 @@ import constants
 import torch
 from constants import LABELS
 
-
-class SimpleConv(nn.Module):
+class SimpleConvNew(nn.Module):
     def __init__(self, n_input=1, n_output=35, stride=16, n_channel=64):
         super().__init__()
         self.conv1 = nn.Conv1d(n_input, n_channel, kernel_size=80, stride=stride)
