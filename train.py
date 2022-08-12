@@ -1,6 +1,5 @@
 from models.torch_lightling_train_module import BaseTorchLightlingWrapper
 from models.simple_conv import SimpleConv
-from models.new_conv import SimpleConvNew
 import torch
 from datasets.torch_lightling_datamodule import SpeechCommandDataModule
 import pytorch_lightning as pl
@@ -11,6 +10,8 @@ from torch.nn import functional as F
 import argparse
 import constants
 from models.mobile_vit import MobileViTModelCustom, spec_collate_fn, one_hot_to_index
+from models.bc_resnet import BcResNetModel
+from datasets.mel_spec_dataset import MelSpecDataSet, mel_collate_fn
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -30,16 +31,19 @@ if __name__ == "__main__":
         loss_fn = torch.nn.BCEWithLogitsLoss()
         label_converter = one_hot_to_index
         collate_fn = spec_collate_fn
+        dataset_fn = AudioArrayDataSet
     elif args.model == "conv" or args.model is None:
         core_model = SimpleConv()
         loss_fn = F.nll_loss
         label_converter = None
         collate_fn = simconv_collate_fn
-    elif args.model == "convnew":
-        core_model = SimpleConvNew()
+        dataset_fn = AudioArrayDataSet
+    elif args.model == "bc_resnet":
+        core_model = BcResNetModel()
         loss_fn = F.nll_loss
         label_converter = None
-        collate_fn = simconv_collate_fn
+        collate_fn = mel_collate_fn
+        dataset_fn = MelSpecDataSet
 
 
     pl.seed_everything(0)
@@ -51,8 +55,7 @@ if __name__ == "__main__":
         learning_rate=args.lr
         )
 
-    data_module = SpeechCommandDataModule(AudioArrayDataSet, collate_fn, batch_size=args.batch_size)
-    # data_module.prepare_data()
+    data_module = SpeechCommandDataModule(dataset_fn, collate_fn, batch_size=args.batch_size)
 
     if torch.cuda.is_available():
         trainer = pl.Trainer(gpus=1, max_epochs=args.epochs, logger=wandb_logger)
