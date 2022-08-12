@@ -1,7 +1,6 @@
 scipy
 torch
 torchaudio
-sklearn
 plotly
 pandas
 matplotlib

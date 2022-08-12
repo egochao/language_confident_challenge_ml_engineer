@@ -7,23 +7,50 @@ from pytorch_lightning.loggers import WandbLogger
 from datasets.base_dataset import AudioArrayDataSet
 from models.simple_conv import simconv_collate_fn
 from torch.nn import functional as F
+import argparse
+import constants
+from models.mobile_vit import MobileViTModelCustom, spec_collate_fn, one_hot_to_index
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model", type=str)
+    parser.add_argument("--batch_size", type=int, default=constants.BATCH_SIZE)
+    parser.add_argument("--lr", type=float, default=constants.LEARNING_RATE)
+    parser.add_argument("--epochs", type=int, default=constants.EPOCHS)
+
+    return parser.parse_args()
 
 if __name__ == "__main__":
-    core_model = SimpleConv()
+    args = parse_args()
+
+
+    if args.model == "vit":
+        core_model = MobileViTModelCustom()
+        loss_fn = torch.nn.BCEWithLogitsLoss()
+        label_converter = one_hot_to_index
+        collate_fn = spec_collate_fn
+    elif args.model == "conv" or args.model is None:
+        core_model = SimpleConv()
+        loss_fn = F.nll_loss
+        label_converter = None
+        collate_fn = simconv_collate_fn
+
 
     pl.seed_everything(0)
     wandb_logger = WandbLogger(project="ViT_experiments")
-    loss_fn = F.nll_loss
-    model = BaseTorchLightlingWrapper(core_model, loss_fn)
+    model = BaseTorchLightlingWrapper(
+        core_model = core_model, 
+        loss_fn = loss_fn, 
+        label_converter=label_converter,
+        learning_rate=args.lr
+        )
 
-    data_module = SpeechCommandDataModule(AudioArrayDataSet, simconv_collate_fn)
-    data_module.prepare_data()
-    data_module.setup()
+    data_module = SpeechCommandDataModule(AudioArrayDataSet, collate_fn, batch_size=args.batch_size)
+    # data_module.prepare_data()
 
     if torch.cuda.is_available():
-        trainer = pl.Trainer(gpus=1, max_epochs=80, logger=wandb_logger)
+        trainer = pl.Trainer(gpus=1, max_epochs=args.epochs, logger=wandb_logger)
     else:
-        trainer = pl.Trainer(max_epochs=80, logger=wandb_logger)
+        trainer = pl.Trainer(max_epochs=args.epochs, logger=wandb_logger)
 
     trainer.fit(model, data_module)

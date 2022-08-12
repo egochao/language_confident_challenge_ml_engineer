@@ -7,6 +7,7 @@ NEW_SAMPLE_RATE = 8000
 DATA_DIR = Path("./data/")
 SUB_DATASET_PATH = "SpeechCommands/speech_commands_v0.02/"
 LEARNING_RATE = 1e-2
+EPOCHS = 50
 
 NUM_WORKERS = 4
 PIN_MEMORY = True
