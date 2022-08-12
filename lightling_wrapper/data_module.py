@@ -6,7 +6,7 @@ from torchaudio.datasets import SPEECHCOMMANDS
 
 import constants
 from constants import NUM_WORKERS, PIN_MEMORY
-from datasets.base_dataset import AudioArrayDataSet
+from models.simple_conv.base_dataset import AudioArrayDataSet
 
 
 class SpeechCommandDataModule(LightningDataModule):

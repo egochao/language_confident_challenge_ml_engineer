@@ -6,13 +6,13 @@ from pytorch_lightning.loggers import WandbLogger
 from torch.nn import functional as F
 
 import constants
-from datasets.base_dataset import AudioArrayDataSet
-from datasets.mel_spec_dataset import MelSpecDataSet, mel_collate_fn
+from models.simple_conv.base_dataset import AudioArrayDataSet
+from models.bc_resnet.mel_spec_dataset import MelSpecDataSet, mel_collate_fn
 from lightling_wrapper import SpeechCommandDataModule, BaseTorchLightlingWrapper
-from models.bc_resnet import BcResNetModel
+from models.bc_resnet.bc_resnet_model import BcResNetModel
 from models.mobile_vit import (MobileViTModelCustom, one_hot_to_index,
                                spec_collate_fn)
-from models.simple_conv import SimpleConv, simconv_collate_fn
+from models.simple_conv.simple_conv_model import SimpleConv, simconv_collate_fn
 
 
 def parse_args():
@@ -28,13 +28,13 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
 
-    if args.model == "vit":
-        core_model = MobileViTModelCustom()
-        loss_fn = torch.nn.BCEWithLogitsLoss()
-        label_converter = one_hot_to_index
-        collate_fn = spec_collate_fn
-        dataset_fn = AudioArrayDataSet
-    elif args.model == "conv" or args.model is None:
+    # if args.model == "vit":
+    #     core_model = MobileViTModelCustom()
+    #     loss_fn = torch.nn.BCEWithLogitsLoss()
+    #     label_converter = one_hot_to_index
+    #     collate_fn = spec_collate_fn
+    #     dataset_fn = AudioArrayDataSet
+    if args.model == "conv" or args.model is None:
         core_model = SimpleConv()
         loss_fn = F.nll_loss
         label_converter = None
