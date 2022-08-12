@@ -1,5 +1,6 @@
 import sys
-sys.path.append('..')
+
+sys.path.append("..")
 from models.torch_lightling_train_module import BaseTorchLightlingWrapper
 from models.simple_conv import SimpleConv
 import torch
@@ -14,9 +15,11 @@ from datasets.mel_spec_dataset import MelSpecDataSet, mel_collate_fn
 
 
 if __name__ == "__main__":
-    data_module = SpeechCommandDataModule(MelSpecDataSet, mel_collate_fn, batch_size=256)
-    
+    data_module = SpeechCommandDataModule(
+        MelSpecDataSet, mel_collate_fn, batch_size=256
+    )
+
     for idx, data in enumerate(data_module.train_dataloader()):
         print(idx, data[0].shape)
-        if idx> 100:
+        if idx > 100:
             break

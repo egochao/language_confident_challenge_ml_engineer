@@ -12,19 +12,19 @@ class SimpleConv(nn.Module):
         self.conv1 = nn.Conv1d(n_input, n_channel, kernel_size=80, stride=stride)
         self.bn1 = nn.BatchNorm1d(n_channel)
         self.pool1 = nn.MaxPool1d(4)
-        
+
         self.conv2 = nn.Conv1d(n_channel, n_channel, kernel_size=3)
         self.bn2 = nn.BatchNorm1d(n_channel)
         self.pool2 = nn.MaxPool1d(4)
-        
+
         self.conv3 = nn.Conv1d(n_channel, 2 * n_channel, kernel_size=3)
         self.bn3 = nn.BatchNorm1d(2 * n_channel)
         self.pool3 = nn.MaxPool1d(4)
-        
+
         self.conv4 = nn.Conv1d(2 * n_channel, 2 * n_channel, kernel_size=3)
         self.bn4 = nn.BatchNorm1d(2 * n_channel)
         self.pool4 = nn.MaxPool1d(4)
-        
+
         self.fc1 = nn.Linear(2 * n_channel, n_output)
 
     def forward(self, x):
@@ -44,6 +44,7 @@ class SimpleConv(nn.Module):
         x = x.permute(0, 2, 1)
         x = self.fc1(x)
         return F.log_softmax(x, dim=2).squeeze()
+
 
 transform = torchaudio.transforms.Resample(
     orig_freq=constants.ORIGINAL_SAMPLE_RATE, new_freq=constants.NEW_SAMPLE_RATE

@@ -13,6 +13,7 @@ from models.mobile_vit import MobileViTModelCustom, spec_collate_fn, one_hot_to_
 from models.bc_resnet import BcResNetModel
 from datasets.mel_spec_dataset import MelSpecDataSet, mel_collate_fn
 
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", type=str)
@@ -22,9 +23,9 @@ def parse_args():
 
     return parser.parse_args()
 
+
 if __name__ == "__main__":
     args = parse_args()
-
 
     if args.model == "vit":
         core_model = MobileViTModelCustom()
@@ -45,20 +46,23 @@ if __name__ == "__main__":
         collate_fn = mel_collate_fn
         dataset_fn = MelSpecDataSet
 
-
     pl.seed_everything(0)
     wandb_logger = WandbLogger(project="ViT_experiments")
     model = BaseTorchLightlingWrapper(
-        core_model = core_model, 
-        loss_fn = loss_fn, 
+        core_model=core_model,
+        loss_fn=loss_fn,
         label_converter=label_converter,
-        learning_rate=args.lr
-        )
+        learning_rate=args.lr,
+    )
 
-    data_module = SpeechCommandDataModule(dataset_fn, collate_fn, batch_size=args.batch_size)
+    data_module = SpeechCommandDataModule(
+        dataset_fn, collate_fn, batch_size=args.batch_size
+    )
 
     if torch.cuda.is_available():
-        trainer = pl.Trainer(accelerator='gpu', devices=1, max_epochs=args.epochs, logger=wandb_logger)
+        trainer = pl.Trainer(
+            accelerator="gpu", devices=1, max_epochs=args.epochs, logger=wandb_logger
+        )
     else:
         trainer = pl.Trainer(max_epochs=args.epochs, logger=wandb_logger)
 

@@ -10,10 +10,14 @@ import constants
 
 
 def prepare_wav(waveform, sample_rate):
-    if sample_rate != constants.ORIGINAL_SAMPLE_RATE: 
-        resampler = transforms.Resample(orig_freq=constants.NEW_SAMPLE_RATE, new_freq=constants.ORIGINAL_SAMPLE_RATE)
+    if sample_rate != constants.ORIGINAL_SAMPLE_RATE:
+        resampler = transforms.Resample(
+            orig_freq=constants.NEW_SAMPLE_RATE, new_freq=constants.ORIGINAL_SAMPLE_RATE
+        )
         waveform = resampler(waveform)
-    to_mel = transforms.MelSpectrogram(sample_rate=constants.ORIGINAL_SAMPLE_RATE, n_fft=1024, f_max=8000, n_mels=40)
+    to_mel = transforms.MelSpectrogram(
+        sample_rate=constants.ORIGINAL_SAMPLE_RATE, n_fft=1024, f_max=8000, n_mels=40
+    )
     log_mel = (to_mel(waveform) + constants.EPS).log2()
     return log_mel
 
@@ -21,15 +25,18 @@ def prepare_wav(waveform, sample_rate):
 class MelSpecDataSet(SPEECHCOMMANDS):
     def __init__(self, subset: str, path="./data"):
         super().__init__(path, download=True)
-        self.to_mel = transforms.MelSpectrogram(sample_rate=constants.ORIGINAL_SAMPLE_RATE, n_fft=1024, f_max=8000, n_mels=40)
+        self.to_mel = transforms.MelSpectrogram(
+            sample_rate=constants.ORIGINAL_SAMPLE_RATE,
+            n_fft=1024,
+            f_max=8000,
+            n_mels=40,
+        )
         self.subset = subset
 
         def load_list(filename):
             filepath = os.path.join(self._path, filename)
             with open(filepath) as fh:
-                return [
-                    os.path.join(self._path, line.strip()) for line in fh
-                ]
+                return [os.path.join(self._path, line.strip()) for line in fh]
 
         self._noise = []
 
@@ -42,22 +49,36 @@ class MelSpecDataSet(SPEECHCOMMANDS):
             excludes = set(excludes)
             self._walker = [w for w in self._walker if w not in excludes]
 
-            noise_paths = [w for w in os.listdir(os.path.join(self._path, "_background_noise_")) if w.endswith(".wav")]
+            noise_paths = [
+                w
+                for w in os.listdir(os.path.join(self._path, "_background_noise_"))
+                if w.endswith(".wav")
+            ]
             for item in noise_paths:
-                noise_path =  os.path.join(self._path, "_background_noise_", item)
-                noise_waveform, noise_sr = torchaudio.sox_effects.apply_effects_file(noise_path, effects=[])
-                noise_waveform = transforms.Resample(orig_freq=noise_sr, new_freq=constants.ORIGINAL_SAMPLE_RATE)(noise_waveform)
+                noise_path = os.path.join(self._path, "_background_noise_", item)
+                noise_waveform, noise_sr = torchaudio.sox_effects.apply_effects_file(
+                    noise_path, effects=[]
+                )
+                noise_waveform = transforms.Resample(
+                    orig_freq=noise_sr, new_freq=constants.ORIGINAL_SAMPLE_RATE
+                )(noise_waveform)
                 self._noise.append(noise_waveform)
         else:
-            raise ValueError(f"Unknown subset {subset}. Use validation/testing/training")
+            raise ValueError(
+                f"Unknown subset {subset}. Use validation/testing/training"
+            )
 
     def _noise_augment(self, waveform):
         noise_waveform = random.choice(self._noise)
 
         noise_sample_start = 0
         if noise_waveform.shape[1] - waveform.shape[1] > 0:
-            noise_sample_start = random.randint(0, noise_waveform.shape[1] - waveform.shape[1])
-        noise_waveform = noise_waveform[:, noise_sample_start:noise_sample_start+waveform.shape[1]]
+            noise_sample_start = random.randint(
+                0, noise_waveform.shape[1] - waveform.shape[1]
+            )
+        noise_waveform = noise_waveform[
+            :, noise_sample_start : noise_sample_start + waveform.shape[1]
+        ]
 
         signal_power = waveform.norm(p=2)
         noise_power = noise_waveform.norm(p=2)
@@ -82,15 +103,17 @@ class MelSpecDataSet(SPEECHCOMMANDS):
     def _augment(self, waveform):
         if random.random() < 0.8:
             waveform = self._noise_augment(waveform)
-        
+
         waveform = self._shift_augment(waveform)
 
         return waveform
 
     def __getitem__(self, n):
         waveform, sample_rate, label, _, _ = super().__getitem__(n)
-        if sample_rate != constants.ORIGINAL_SAMPLE_RATE: 
-            resampler = transforms.Resample(orig_freq=sample_rate, new_freq=constants.ORIGINAL_SAMPLE_RATE)
+        if sample_rate != constants.ORIGINAL_SAMPLE_RATE:
+            resampler = transforms.Resample(
+                orig_freq=sample_rate, new_freq=constants.ORIGINAL_SAMPLE_RATE
+            )
             waveform = resampler(waveform)
         if self.subset == "training":
             waveform = self._augment(waveform)
@@ -114,7 +137,7 @@ def idx_to_label(idx):
 def pad_sequence(batch):
     batch = [item.permute(2, 1, 0) for item in batch]
     batch = torch.nn.utils.rnn.pad_sequence(batch, batch_first=True)
-    return batch.permute(0, 3, 2, 1) 
+    return batch.permute(0, 3, 2, 1)
 
 
 def mel_collate_fn(batch):
