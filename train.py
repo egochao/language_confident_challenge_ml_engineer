@@ -8,8 +8,7 @@ from torch.nn import functional as F
 import constants
 from datasets.base_dataset import AudioArrayDataSet
 from datasets.mel_spec_dataset import MelSpecDataSet, mel_collate_fn
-from lightling_wrapper.data_module import SpeechCommandDataModule
-from lightling_wrapper.train_module import BaseTorchLightlingWrapper
+from lightling_wrapper import SpeechCommandDataModule, BaseTorchLightlingWrapper
 from models.bc_resnet import BcResNetModel
 from models.mobile_vit import (MobileViTModelCustom, one_hot_to_index,
                                spec_collate_fn)
