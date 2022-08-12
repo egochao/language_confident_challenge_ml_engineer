@@ -40,7 +40,7 @@ if __name__ == "__main__":
         collate_fn = simconv_collate_fn
         dataset_fn = AudioArrayDataSet
     elif args.model == "bc_resnet":
-        core_model = BcResNetModel()
+        core_model = BcResNetModel(scale=constants.SCALE_BC_RESNET)
         loss_fn = F.nll_loss
         label_converter = None
         collate_fn = mel_collate_fn

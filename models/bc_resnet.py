@@ -7,7 +7,7 @@ import constants
 class BcResNetModel(nn.Module):
     def __init__(
         self,
-        n_class: int = 35,
+        n_class: int = len(constants.LABELS),
         *,
         scale: int = 1,
         dropout: float = constants.DROPOUT,
