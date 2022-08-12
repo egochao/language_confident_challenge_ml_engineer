@@ -5,14 +5,12 @@ from pytorch_lightning import LightningDataModule
 from torchaudio.datasets import SPEECHCOMMANDS
 
 import constants
-from constants import NUM_WORKERS, PIN_MEMORY
-from models.simple_conv.base_dataset import AudioArrayDataSet
 
 
 class SpeechCommandDataModule(LightningDataModule):
     def __init__(
         self,
-        dataset: AudioArrayDataSet,
+        dataset,
         collate_fn: Optional[Callable],
         data_dir=None,
         batch_size=None,
@@ -22,8 +20,8 @@ class SpeechCommandDataModule(LightningDataModule):
         self.collate_fn = collate_fn
         self.data_dir = data_dir or constants.DATA_DIR
         self.batch_size = batch_size or constants.BATCH_SIZE
-        self.num_workers = NUM_WORKERS
-        self.pin_memory = PIN_MEMORY
+        self.num_workers = constants.NUM_WORKERS
+        self.pin_memory = constants.PIN_MEMORY
 
     def prepare_data(self):
         """called only once and on 1 GPU"""

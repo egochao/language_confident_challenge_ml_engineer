@@ -6,11 +6,12 @@ from pytorch_lightning.loggers import WandbLogger
 from torch.nn import functional as F
 
 import constants
-from models.simple_conv.base_dataset import AudioArrayDataSet
-from models.bc_resnet.mel_spec_dataset import MelSpecDataSet, mel_collate_fn
-from lightling_wrapper import SpeechCommandDataModule, BaseTorchLightlingWrapper
+from lightling_wrapper import (BaseTorchLightlingWrapper,
+                               SpeechCommandDataModule)
 from models.bc_resnet.bc_resnet_model import BcResNetModel
-from models.simple_conv.simple_conv_model import SimpleConv, simconv_collate_fn
+from models.bc_resnet.mel_spec_dataset import MelSpecDataSet, mel_collate_fn
+from models.simple_conv.base_dataset import AudioArrayDataSet, simconv_collate_fn
+from models.simple_conv.simple_conv_model import SimpleConv
 
 
 def parse_args():
