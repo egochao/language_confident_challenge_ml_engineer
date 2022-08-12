@@ -58,7 +58,7 @@ if __name__ == "__main__":
     data_module = SpeechCommandDataModule(dataset_fn, collate_fn, batch_size=args.batch_size)
 
     if torch.cuda.is_available():
-        trainer = pl.Trainer(gpus=1, max_epochs=args.epochs, logger=wandb_logger)
+        trainer = pl.Trainer(accelerator='gpu', devices=1, max_epochs=args.epochs, logger=wandb_logger)
     else:
         trainer = pl.Trainer(max_epochs=args.epochs, logger=wandb_logger)
 
