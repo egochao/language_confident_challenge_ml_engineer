@@ -3,7 +3,7 @@ from typing import Callable, Optional
 import torch
 from pytorch_lightning import LightningDataModule
 from torchaudio.datasets import SPEECHCOMMANDS
-
+from pathlib import Path
 import constants
 
 
@@ -51,6 +51,51 @@ class SpeechCommandDataModule(LightningDataModule):
     def test_dataloader(self):
         return torch.utils.data.DataLoader(
             self.dataset_obj("testing", self.data_dir),
+            batch_size=self.batch_size,
+            shuffle=False,
+            collate_fn=self.collate_fn,
+            num_workers=self.num_workers,
+            pin_memory=self.pin_memory,
+        )
+
+
+class DistillSpeechCommandDataModule(SpeechCommandDataModule):
+    def __init__(self, logit_path: Path, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.logit_path = logit_path
+
+    def train_dataloader(self):
+        return torch.utils.data.DataLoader(
+            self.dataset_obj(
+                logit_path=self.logit_path,
+                subset="train", 
+                data_dir=self.data_dir),
+            batch_size=self.batch_size,
+            shuffle=True,
+            collate_fn=self.collate_fn,
+            num_workers=self.num_workers,
+            pin_memory=self.pin_memory,
+        )
+
+    def val_dataloader(self):
+        return torch.utils.data.DataLoader(
+            self.dataset_obj(
+                logit_path=self.logit_path,
+                subset="train", 
+                data_dir=self.data_dir),
+            batch_size=self.batch_size,
+            shuffle=False,
+            collate_fn=self.collate_fn,
+            num_workers=self.num_workers,
+            pin_memory=self.pin_memory,
+        )
+
+    def test_dataloader(self):
+        return torch.utils.data.DataLoader(
+            self.dataset_obj(
+                logit_path=self.logit_path,
+                subset="train", 
+                data_dir=self.data_dir),
             batch_size=self.batch_size,
             shuffle=False,
             collate_fn=self.collate_fn,

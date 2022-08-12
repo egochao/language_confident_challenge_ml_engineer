@@ -1,2 +1,2 @@
-from .data_module import SpeechCommandDataModule
-from .train_module import BaseTorchLightlingWrapper
+from .data_module import SpeechCommandDataModule, DistillSpeechCommandDataModule
+from .train_module import BaseTorchLightlingWrapper, DistillModelTorchLightlingWrapper
