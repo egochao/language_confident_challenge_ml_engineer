@@ -1,11 +1,12 @@
+from typing import Callable, Optional
+
 import torch
+from pytorch_lightning import LightningDataModule
 from torchaudio.datasets import SPEECHCOMMANDS
-from pytorch_lightning import LightningDataModule
-from pytorch_lightning import LightningDataModule
+
 import constants
 from constants import NUM_WORKERS, PIN_MEMORY
 from datasets.base_dataset import AudioArrayDataSet
-from typing import Callable, Optional
 
 
 class SpeechCommandDataModule(LightningDataModule):

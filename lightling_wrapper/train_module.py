@@ -3,7 +3,6 @@ import torch
 import torch.nn
 from torchmetrics import Accuracy
 
-import torch
 import constants
 
 

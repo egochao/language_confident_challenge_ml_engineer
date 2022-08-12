@@ -1,10 +1,10 @@
 import sys
 
 sys.path.append("..")
-from models.torch_lightling_train_module import BaseTorchLightlingWrapper
+from lightling_wrapper.train_module import BaseTorchLightlingWrapper
 from models.simple_conv import SimpleConv
 import torch
-from datasets.torch_lightling_datamodule import SpeechCommandDataModule
+from lightling_wrapper.data_module import SpeechCommandDataModule
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
 from datasets.base_dataset import AudioArrayDataSet
