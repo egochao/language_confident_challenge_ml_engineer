@@ -1,35 +1,40 @@
 from torchaudio.datasets import SPEECHCOMMANDS
-import os
-import constants
 from pathlib import Path
 import torchaudio
-import constants
 import torch
 
 import constants
+from torch import Tensor
+import torch
+from typing import Tuple
 
 
 class AudioArrayDataSet(SPEECHCOMMANDS):
     def __init__(self, subset: str = None, data_dir: Path = constants.DATA_DIR):
         super().__init__(data_dir)
-
-        def load_list(filepath,):
-            with open(filepath) as fileobj:
-                return [
-                    line.strip()
-                    for line in fileobj
-                ]
+        
         audio_path = Path(self._path)
-        if subset == "validation":
-            self.file_list = load_list(audio_path / "validation_list.txt")
-        elif subset == "testing":
-            self.file_list = load_list(audio_path / "testing_list.txt")
-        elif subset == "train":
-            excludes = load_list(audio_path / "validation_list.txt") + load_list(audio_path / "testing_list.txt")
-            excludes = set(excludes)
-            self.file_list = [w for w in self._walker if w not in excludes]
+        create_train_subset_file(audio_path)
+        self.file_list = load_list(audio_path / f'{subset}_list.txt')
 
         self._walker = [audio_path.joinpath(each) for each in self.file_list]
+
+    def __getitem__(self, index: int) -> Tuple[Tensor, int, str, str, int]:
+        waveform, _, label, _, _ = super().__getitem__(index)
+        return waveform, label
+
+
+class AudioArrayWithLogitDataset(AudioArrayDataSet):
+    def __init__(self, logit_path: Path, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.logit_walker = [logit_path.joinpath(each.replace('wav', 'pt')) for each in self.file_list]
+
+
+    def __getitem__(self, index: int) -> Tuple[Tensor, int, str, str, int]:
+        waveform, label = super().__getitem__(index)
+        logit = torch.load(self.logit_walker[index])
+        return waveform, logit, label
 
 
 transform = torchaudio.transforms.Resample(
@@ -38,33 +43,73 @@ transform = torchaudio.transforms.Resample(
 
 
 def pad_sequence(batch):
-    # Make all tensor in a batch the same length by padding with zeros
+    """Make all tensor in a batch the same length by padding with zeros"""
     batch = [item.t() for item in batch]
     batch = torch.nn.utils.rnn.pad_sequence(batch, batch_first=True, padding_value=0.0)
     batch = transform(batch.squeeze())
     return batch.unsqueeze(1)
-    # return batch.permute(0, 2, 1)
-
-
+    
 def label_to_index(word):
-    # Return the position of the word in labels
+    """Return the position of the word in labels"""
     return torch.tensor(constants.LABELS.index(word))
 
 
 def simconv_collate_fn(batch):
-
-    # A data tuple has the form:
-    # waveform, sample_rate, label, speaker_id, utterance_number
-
+    """Collate function for dataset"""
     tensors, targets = [], []
 
-    # Gather in lists, and encode labels as indices
-    for waveform, _, label, *_ in batch:
+    for waveform, label in batch:
         tensors += [waveform]
         targets += [label_to_index(label)]
 
-    # Group the list of tensors into a batched tensor
     tensors = pad_sequence(tensors)
     targets = torch.stack(targets)
 
     return tensors, targets
+
+def simconv_collate_logit_fn(batch):
+    """Collate function for logit dataset"""
+    tensor_wav, tensor_logit, targets = [], [], []
+
+    for waveform, logit, label in batch:
+        tensor_wav += [waveform]
+        tensor_logit += [logit]
+        targets += [label_to_index(label)]
+
+    tensor_wav = pad_sequence(tensor_wav)
+    targets = torch.stack(targets)
+    tensor_logit = torch.stack(tensor_logit)
+
+    return tensor_wav, tensor_logit, targets
+
+
+def create_train_subset_file(base_path, replace_existing=False):
+    """Create training file exclude validation and test"""
+    train_filepath = base_path / 'train_list.txt'
+
+    if not replace_existing and train_filepath.exists():
+        return
+
+    with open(base_path / 'validation_list.txt', 'r') as f:
+        val_list = f.readlines()
+    with open(base_path / 'testing_list.txt', 'r') as f:
+        test_list = f.readlines()
+    val_test_list = set(test_list+val_list)
+
+    all_list = []
+    for path in base_path.glob('*/'):
+        if path.stem in constants.LABELS:
+            audio_files = list(path.glob('*.wav'))
+            file_list = [f"{f.parent.stem}/{f.name}" for f in audio_files]
+            all_list += file_list
+
+    training_list = [x for x in all_list if x not in val_test_list]
+    with open(train_filepath, 'w') as f:
+        for line in training_list:
+            f.write(f"{line}\n")
+
+
+def load_list(filepath):
+    """Load text and clean"""
+    with open(filepath) as fileobj:
+        return [line.strip() for line in fileobj]
