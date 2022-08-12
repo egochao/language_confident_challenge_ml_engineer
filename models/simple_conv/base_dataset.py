@@ -5,29 +5,31 @@ from pathlib import Path
 import torchaudio
 import constants
 import torch
-from constants import LABELS
+
+import constants
 
 
 class AudioArrayDataSet(SPEECHCOMMANDS):
     def __init__(self, subset: str = None, data_dir: Path = constants.DATA_DIR):
         super().__init__(data_dir)
 
-        def load_list(filename):
-            filepath = os.path.join(self._path, filename)
+        def load_list(filepath,):
             with open(filepath) as fileobj:
                 return [
-                    os.path.normpath(os.path.join(self._path, line.strip()))
+                    line.strip()
                     for line in fileobj
                 ]
-
+        audio_path = Path(self._path)
         if subset == "validation":
-            self._walker = load_list("validation_list.txt")
+            self.file_list = load_list(audio_path / "validation_list.txt")
         elif subset == "testing":
-            self._walker = load_list("testing_list.txt")
+            self.file_list = load_list(audio_path / "testing_list.txt")
         elif subset == "train":
-            excludes = load_list("validation_list.txt") + load_list("testing_list.txt")
+            excludes = load_list(audio_path / "validation_list.txt") + load_list(audio_path / "testing_list.txt")
             excludes = set(excludes)
-            self._walker = [w for w in self._walker if w not in excludes]
+            self.file_list = [w for w in self._walker if w not in excludes]
+
+        self._walker = [audio_path.joinpath(each) for each in self.file_list]
 
 
 transform = torchaudio.transforms.Resample(
@@ -46,7 +48,7 @@ def pad_sequence(batch):
 
 def label_to_index(word):
     # Return the position of the word in labels
-    return torch.tensor(LABELS.index(word))
+    return torch.tensor(constants.LABELS.index(word))
 
 
 def simconv_collate_fn(batch):
