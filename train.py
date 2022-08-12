@@ -1,5 +1,5 @@
 from models.torch_lightling_train_module import BaseTorchLightlingWrapper
-from models.simple_conv import SimpleConv
+from models.simple_conv import SimpleConv, SimpleConvNew
 import torch
 from datasets.torch_lightling_datamodule import SpeechCommandDataModule
 import pytorch_lightning as pl
@@ -31,6 +31,11 @@ if __name__ == "__main__":
         collate_fn = spec_collate_fn
     elif args.model == "conv" or args.model is None:
         core_model = SimpleConv()
+        loss_fn = F.nll_loss
+        label_converter = None
+        collate_fn = simconv_collate_fn
+    elif args.model == "convnew":
+        core_model = SimpleConvNew()
         loss_fn = F.nll_loss
         label_converter = None
         collate_fn = simconv_collate_fn
