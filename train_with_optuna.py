@@ -3,6 +3,8 @@ from torch.nn import functional as F
 import optuna
 from optuna.integration import PyTorchLightningPruningCallback
 
+import argparse
+
 import constants
 from lightling_wrapper import BaseTorchLightlingWrapper, SpeechCommandDataModule
 from models.bc_resnet.bc_resnet_model import BcResNetModel
@@ -50,11 +52,56 @@ def sim_conv_param_search(trial: optuna.trial.Trial) -> float:
     return trainer.callback_metrics["val_acc"].item()
 
 
+def bc_resnet_param_search(trial: optuna.trial.Trial) -> float:
+    loss_fn = F.nll_loss
+    collate_fn = mel_collate_fn
+    dataset_fn = MelSpecDataSet
+
+    scale = trial.suggest_float("scale", 0.4, 2)
+    drop_out = trial.suggest_float("drop_out", 0.0, 0.4)
+
+    model = BaseTorchLightlingWrapper(
+        core_model=BcResNetModel(
+            scale=scale, dropout=drop_out
+        ),
+        loss_fn=loss_fn,
+        learning_rate=constants.LEARNING_RATE,
+    )
+
+    data_module = SpeechCommandDataModule(
+        dataset_fn, collate_fn, batch_size=constants.BATCH_SIZE
+    )
+
+    trainer = pl.Trainer(
+        logger=True,
+        enable_checkpointing=False,
+        max_epochs=constants.EPOCHS,
+        accelerator="gpu",
+        devices=1,
+        callbacks=[PyTorchLightningPruningCallback(trial, monitor="val_acc")],
+    )
+
+    hyperparameters = dict(
+        scale=scale, dropout=drop_out
+    )
+    trainer.logger.log_hyperparams(hyperparameters)
+    trainer.fit(model, datamodule=data_module)
+
+    return trainer.callback_metrics["val_acc"].item()
+
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model", type=str)
+    args = parser.parse_args()
+    
     pruner: optuna.pruners.BasePruner = optuna.pruners.MedianPruner()
 
     study = optuna.create_study(direction="maximize", pruner=pruner)
-    study.optimize(sim_conv_param_search, n_trials=100, timeout=1000)
+
+    if args.model == "sim_conv" or args.model is None:    
+        study.optimize(sim_conv_param_search, n_trials=200, timeout=None)
+    elif args.model == "bc_resnet":
+        study.optimize(bc_resnet_param_search, n_trials=1000, timeout=None)
 
     print("Number of finished trials: {}".format(len(study.trials)))
 
