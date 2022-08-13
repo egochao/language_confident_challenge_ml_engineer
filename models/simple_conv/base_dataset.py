@@ -11,7 +11,7 @@ from typing import Tuple
 
 class AudioArrayDataSet(SPEECHCOMMANDS):
     def __init__(self, subset: str = None, data_dir: Path = constants.DATA_DIR):
-        super().__init__(data_dir)
+        super().__init__(data_dir, download=True)
         
         audio_path = Path(self._path)
         create_train_subset_file(audio_path)

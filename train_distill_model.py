@@ -9,12 +9,10 @@ from pathlib import Path
 import constants
 from lightling_wrapper import DistillSpeechCommandDataModule, DistillModelTorchLightlingWrapper
 from models.bc_resnet.bc_resnet_model import BcResNetModel
-from models.bc_resnet.mel_spec_dataset import MelSpecDataSet, mel_collate_fn
-from models.simple_conv.base_dataset import (AudioArrayDataSet,
-                                             simconv_collate_fn,
-                                             AudioArrayWithLogitDataset,
+from models.bc_resnet.mel_spec_dataset import MelSpecDataSet, mel_collate_logit_fn, MelSpecWithLogitDataset
+from models.simple_conv.base_dataset import (AudioArrayWithLogitDataset,
                                              simconv_collate_logit_fn)
-from models.simple_conv.simple_conv_model import SimpleConv, SimpleConvNoSoftMax
+from models.simple_conv.simple_conv_model import SimpleConvNoSoftMax
 from utils.model_utils import distillation_loss
 
 
@@ -37,11 +35,11 @@ if __name__ == "__main__":
         loss_fn = distillation_loss
         collate_fn = simconv_collate_logit_fn
         dataset_fn = AudioArrayWithLogitDataset
-    # elif args.model == "bc_resnet":
-    #     core_model = BcResNetModel(scale=constants.SCALE_BC_RESNET)
-    #     loss_fn = F.nll_loss
-    #     collate_fn = mel_collate_fn
-    #     dataset_fn = MelSpecDataSet
+    elif args.model == "bc_resnet":
+        core_model = BcResNetModel(scale=constants.SCALE_BC_RESNET)
+        loss_fn = distillation_loss
+        collate_fn = mel_collate_logit_fn
+        dataset_fn = MelSpecWithLogitDataset
 
     pl.seed_everything(10)
     wandb_logger = WandbLogger(project="ViT_experiments")
