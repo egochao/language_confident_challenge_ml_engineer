@@ -43,7 +43,7 @@ if __name__ == "__main__":
     #     collate_fn = mel_collate_fn
     #     dataset_fn = MelSpecDataSet
 
-    pl.seed_everything(0)
+    pl.seed_everything(10)
     wandb_logger = WandbLogger(project="ViT_experiments")
     model = DistillModelTorchLightlingWrapper(
         core_model=core_model,

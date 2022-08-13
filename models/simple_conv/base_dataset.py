@@ -2,9 +2,9 @@ from torchaudio.datasets import SPEECHCOMMANDS
 from pathlib import Path
 import torchaudio
 import torch
+from tqdm import tqdm
 
 import constants
-from torch import Tensor
 import torch
 from typing import Tuple
 
@@ -19,7 +19,7 @@ class AudioArrayDataSet(SPEECHCOMMANDS):
 
         self._walker = [audio_path.joinpath(each) for each in self.file_list]
 
-    def __getitem__(self, index: int) -> Tuple[Tensor, int, str, str, int]:
+    def __getitem__(self, index: int) -> Tuple:
         waveform, _, label, _, _ = super().__getitem__(index)
         return waveform, label
 
@@ -29,11 +29,11 @@ class AudioArrayWithLogitDataset(AudioArrayDataSet):
         super().__init__(*args, **kwargs)
 
         self.logit_walker = [logit_path.joinpath(each.replace('wav', 'pt')) for each in self.file_list]
+        self.logit_cache = [torch.load(each) for each in tqdm(self.logit_walker)]
 
-
-    def __getitem__(self, index: int) -> Tuple[Tensor, int, str, str, int]:
+    def __getitem__(self, index: int) -> Tuple:
         waveform, label = super().__getitem__(index)
-        logit = torch.load(self.logit_walker[index])
+        logit = self.logit_cache[index]
         return waveform, logit, label
 
 
