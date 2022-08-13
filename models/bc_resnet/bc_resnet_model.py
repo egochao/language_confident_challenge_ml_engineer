@@ -107,6 +107,37 @@ class BcResNetModel(nn.Module):
         return F.log_softmax(x, dim=-1).squeeze()
 
 
+class BcResNetModelNoSoftMax(BcResNetModel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def forward(self, x: torch.Tensor):
+        x = self.input_conv(x)
+        x = self.t1(x)
+        x = self.n11(x)
+
+        x = self.t2(x)
+        x = self.n21(x)
+
+        x = self.t3(x)
+        x = self.n31(x)
+        x = self.n32(x)
+        x = self.n33(x)
+
+        x = self.t4(x)
+        x = self.n41(x)
+        x = self.n42(x)
+        x = self.n43(x)
+
+        x = self.dw_conv(x)
+        x = self.onexone_conv(x)
+
+        x = torch.mean(x, dim=3, keepdim=True)
+        x = self.head_conv(x)
+
+        return x.squeeze()
+
+
 class SubSpectralNorm(nn.Module):
     def __init__(self, channels, sub_bands, eps=1e-5):
         super().__init__()

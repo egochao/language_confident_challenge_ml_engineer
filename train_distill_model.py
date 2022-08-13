@@ -8,7 +8,7 @@ from pathlib import Path
 
 import constants
 from lightling_wrapper import DistillSpeechCommandDataModule, DistillModelTorchLightlingWrapper
-from models.bc_resnet.bc_resnet_model import BcResNetModel
+from models.bc_resnet.bc_resnet_model import BcResNetModel, BcResNetModelNoSoftMax
 from models.bc_resnet.mel_spec_dataset import MelSpecDataSet, mel_collate_logit_fn, MelSpecWithLogitDataset
 from models.simple_conv.base_dataset import (AudioArrayWithLogitDataset,
                                              simconv_collate_logit_fn)
@@ -36,7 +36,7 @@ if __name__ == "__main__":
         collate_fn = simconv_collate_logit_fn
         dataset_fn = AudioArrayWithLogitDataset
     elif args.model == "bc_resnet":
-        core_model = BcResNetModel(scale=constants.SCALE_BC_RESNET)
+        core_model = BcResNetModelNoSoftMax(scale=constants.SCALE_BC_RESNET)
         loss_fn = distillation_loss
         collate_fn = mel_collate_logit_fn
         dataset_fn = MelSpecWithLogitDataset
