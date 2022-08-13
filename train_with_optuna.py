@@ -23,9 +23,7 @@ def sim_conv_param_search(trial: optuna.trial.Trial) -> float:
     kernel_size_l1 = trial.suggest_int("kernel_size_l1", 60, 100)
 
     model = BaseTorchLightlingWrapper(
-        core_model=SimpleConv(
-            n_channel=n_channel, kernel_size_l1=kernel_size_l1
-        ),
+        core_model=SimpleConv(n_channel=n_channel, kernel_size_l1=kernel_size_l1),
         loss_fn=loss_fn,
         learning_rate=constants.LEARNING_RATE,
     )
@@ -43,9 +41,7 @@ def sim_conv_param_search(trial: optuna.trial.Trial) -> float:
         callbacks=[PyTorchLightningPruningCallback(trial, monitor="val_acc")],
     )
 
-    hyperparameters = dict(
-        n_channel=n_channel, kernel_size_l1=kernel_size_l1
-    )
+    hyperparameters = dict(n_channel=n_channel, kernel_size_l1=kernel_size_l1)
     trainer.logger.log_hyperparams(hyperparameters)
     trainer.fit(model, datamodule=data_module)
 
@@ -61,9 +57,7 @@ def bc_resnet_param_search(trial: optuna.trial.Trial) -> float:
     drop_out = trial.suggest_float("drop_out", 0.0, 0.4)
 
     model = BaseTorchLightlingWrapper(
-        core_model=BcResNetModel(
-            scale=scale, dropout=drop_out
-        ),
+        core_model=BcResNetModel(scale=scale, dropout=drop_out),
         loss_fn=loss_fn,
         learning_rate=constants.LEARNING_RATE,
     )
@@ -81,24 +75,23 @@ def bc_resnet_param_search(trial: optuna.trial.Trial) -> float:
         callbacks=[PyTorchLightningPruningCallback(trial, monitor="val_acc")],
     )
 
-    hyperparameters = dict(
-        scale=scale, dropout=drop_out
-    )
+    hyperparameters = dict(scale=scale, dropout=drop_out)
     trainer.logger.log_hyperparams(hyperparameters)
     trainer.fit(model, datamodule=data_module)
 
     return trainer.callback_metrics["val_acc"].item()
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", type=str)
     args = parser.parse_args()
-    
+
     pruner: optuna.pruners.BasePruner = optuna.pruners.MedianPruner()
 
     study = optuna.create_study(direction="maximize", pruner=pruner)
 
-    if args.model == "sim_conv" or args.model is None:    
+    if args.model == "sim_conv" or args.model is None:
         study.optimize(sim_conv_param_search, n_trials=200, timeout=None)
     elif args.model == "bc_resnet":
         study.optimize(bc_resnet_param_search, n_trials=1000, timeout=None)
