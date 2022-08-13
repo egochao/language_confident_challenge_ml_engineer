@@ -11,6 +11,8 @@ data/teacher_logits
 *epoch*
 ViT_experiments
 Untitled*
+events*
+hparams*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

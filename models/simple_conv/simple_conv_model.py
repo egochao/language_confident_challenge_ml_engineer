@@ -3,9 +3,13 @@ import torch.nn.functional as F
 
 
 class SimpleConv(nn.Module):
-    def __init__(self, n_input=1, n_output=35, stride=16, n_channel=32):
+    def __init__(
+        self, n_input=1, n_output=35, stride=16, n_channel=32, kernel_size_l1=80
+    ):
         super().__init__()
-        self.conv1 = nn.Conv1d(n_input, n_channel, kernel_size=80, stride=stride)
+        self.conv1 = nn.Conv1d(
+            n_input, n_channel, kernel_size=kernel_size_l1, stride=stride
+        )
         self.bn1 = nn.BatchNorm1d(n_channel)
         self.pool1 = nn.MaxPool1d(4)
 
