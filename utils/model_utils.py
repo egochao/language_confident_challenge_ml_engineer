@@ -12,8 +12,12 @@ def kd_loss_fn(student_preds, teacher_preds, T):
     loss = nn.KLDivLoss(reduction="batchmean", log_target=True)
 
     return (
-        loss(F.log_softmax(student_preds / T, dim=1), 
-        F.log_softmax(teacher_preds.float() / T, dim=1)) * T * T
+        loss(
+            F.log_softmax(student_preds / T, dim=1),
+            F.log_softmax(teacher_preds.float() / T, dim=1),
+        )
+        * T
+        * T
     )
 
 

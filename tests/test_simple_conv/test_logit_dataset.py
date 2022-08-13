@@ -4,10 +4,11 @@ import torch
 
 import constants
 
-logit_path=Path("data/teacher_logits")
+logit_path = Path("data/teacher_logits")
+
 
 def test_logit_dataset():
-    ds = AudioArrayWithLogitDataset(logit_path=logit_path, subset='train')
+    ds = AudioArrayWithLogitDataset(logit_path=logit_path, subset="train")
     for (log, au) in zip(ds.logit_walker, ds._walker):
         assert log.stem == au.stem
 
@@ -15,4 +16,4 @@ def test_logit_dataset():
 
     logit_shape = len(ds.__getitem__(0)[1])
 
-    assert logit_shape  == expected_logit_shape
+    assert logit_shape == expected_logit_shape

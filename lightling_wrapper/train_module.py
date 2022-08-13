@@ -80,14 +80,14 @@ class DistillModelTorchLightlingWrapper(BaseTorchLightlingWrapper):
         x, teacher_preds, y = batch
         logits = self(x)
         loss = self.loss_fn(logits, teacher_preds, y)
-        
+
         preds = torch.argmax(logits, dim=1)
         acc = self._metric(preds, y)
         self.log("train_loss", loss, on_step=True, on_epoch=True, logger=True)
         self.log("train_acc", acc, on_step=True, on_epoch=True, logger=True)
 
         return loss
-    
+
     def validation_step(self, batch, batch_idx):
         x, teacher_preds, y = batch
         logits = self(x)
@@ -98,12 +98,12 @@ class DistillModelTorchLightlingWrapper(BaseTorchLightlingWrapper):
         self.log("val_loss", loss, prog_bar=True)
         self.log("val_acc", acc, prog_bar=True)
         return loss
-    
+
     def test_step(self, batch, batch_idx):
         x, teacher_preds, y = batch
         logits = self(x)
         loss = self.loss_fn(logits, teacher_preds, y)
-        
+
         preds = torch.argmax(logits, dim=1)
         acc = self._metric(preds, y)
         self.log("test_loss", loss, prog_bar=True)

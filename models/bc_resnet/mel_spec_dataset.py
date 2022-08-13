@@ -27,10 +27,10 @@ class MelSpecDataSet(SPEECHCOMMANDS):
 
         audio_path = Path(self._path)
         create_train_subset_file(audio_path)
-        self.file_list = load_list(audio_path / f'{subset}_list.txt')
+        self.file_list = load_list(audio_path / f"{subset}_list.txt")
 
         self._walker = [audio_path.joinpath(each) for each in self.file_list]
-        
+
         if subset == "train":
             noise_paths = [
                 w
@@ -46,7 +46,7 @@ class MelSpecDataSet(SPEECHCOMMANDS):
                     orig_freq=noise_sr, new_freq=constants.ORIGINAL_SAMPLE_RATE
                 )(noise_waveform)
                 self._noise.append(noise_waveform)
-        
+
     def _noise_augment(self, waveform):
         noise_waveform = random.choice(self._noise)
 
@@ -101,12 +101,13 @@ class MelSpecDataSet(SPEECHCOMMANDS):
         return log_mel, label
 
 
-
 class MelSpecWithLogitDataset(MelSpecDataSet):
     def __init__(self, logit_path: Path, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.logit_walker = [logit_path.joinpath(each.replace('wav', 'pt')) for each in self.file_list]
+        self.logit_walker = [
+            logit_path.joinpath(each.replace("wav", "pt")) for each in self.file_list
+        ]
         self.logit_cache = [torch.load(each) for each in tqdm(self.logit_walker)]
 
     def __getitem__(self, index: int) -> Tuple:
@@ -157,7 +158,6 @@ def mel_collate_logit_fn(batch):
     targets = torch.LongTensor(targets)
     tensor_logit = torch.stack(tensor_logit)
 
-
     return tensor_wav, tensor_logit, targets
 
 
@@ -174,29 +174,28 @@ def prepare_wav(waveform, sample_rate):
     return log_mel
 
 
-
 def create_train_subset_file(base_path, replace_existing=False):
     """Create training file exclude validation and test"""
-    train_filepath = base_path / 'train_list.txt'
+    train_filepath = base_path / "train_list.txt"
 
     if not replace_existing and train_filepath.exists():
         return
 
-    with open(base_path / 'validation_list.txt', 'r') as f:
+    with open(base_path / "validation_list.txt", "r") as f:
         val_list = f.readlines()
-    with open(base_path / 'testing_list.txt', 'r') as f:
+    with open(base_path / "testing_list.txt", "r") as f:
         test_list = f.readlines()
-    val_test_list = set(test_list+val_list)
+    val_test_list = set(test_list + val_list)
 
     all_list = []
-    for path in base_path.glob('*/'):
+    for path in base_path.glob("*/"):
         if path.stem in constants.LABELS:
-            audio_files = list(path.glob('*.wav'))
+            audio_files = list(path.glob("*.wav"))
             file_list = [f"{f.parent.stem}/{f.name}" for f in audio_files]
             all_list += file_list
 
     training_list = [x for x in all_list if x not in val_test_list]
-    with open(train_filepath, 'w') as f:
+    with open(train_filepath, "w") as f:
         for line in training_list:
             f.write(f"{line}\n")
 

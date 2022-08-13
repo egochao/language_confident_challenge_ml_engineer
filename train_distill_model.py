@@ -3,15 +3,22 @@ import argparse
 import pytorch_lightning as pl
 import torch
 from pytorch_lightning.loggers import WandbLogger
-from torch.nn import functional as F
 from pathlib import Path
 
 import constants
-from lightling_wrapper import DistillSpeechCommandDataModule, DistillModelTorchLightlingWrapper
-from models.bc_resnet.bc_resnet_model import BcResNetModel, BcResNetModelNoSoftMax
-from models.bc_resnet.mel_spec_dataset import MelSpecDataSet, mel_collate_logit_fn, MelSpecWithLogitDataset
-from models.simple_conv.base_dataset import (AudioArrayWithLogitDataset,
-                                             simconv_collate_logit_fn)
+from lightling_wrapper import (
+    DistillSpeechCommandDataModule,
+    DistillModelTorchLightlingWrapper,
+)
+from models.bc_resnet.bc_resnet_model import BcResNetModelNoSoftMax
+from models.bc_resnet.mel_spec_dataset import (
+    mel_collate_logit_fn,
+    MelSpecWithLogitDataset,
+)
+from models.simple_conv.base_dataset import (
+    AudioArrayWithLogitDataset,
+    simconv_collate_logit_fn,
+)
 from models.simple_conv.simple_conv_model import SimpleConvNoSoftMax
 from utils.model_utils import distillation_loss
 
@@ -51,9 +58,9 @@ if __name__ == "__main__":
 
     data_module = DistillSpeechCommandDataModule(
         logit_path=Path(args.logit),
-        dataset=dataset_fn, 
-        collate_fn=collate_fn, 
-        batch_size=args.batch_size
+        dataset=dataset_fn,
+        collate_fn=collate_fn,
+        batch_size=args.batch_size,
     )
 
     if torch.cuda.is_available():

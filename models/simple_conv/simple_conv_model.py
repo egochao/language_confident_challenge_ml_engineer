@@ -42,8 +42,6 @@ class SimpleConv(nn.Module):
         return F.log_softmax(x, dim=2).squeeze()
 
 
-
-
 class SimpleConvNoSoftMax(SimpleConv):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

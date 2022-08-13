@@ -20,7 +20,10 @@ class BcResNetModel(nn.Module):
         )
 
         self.t1 = TransitionBlock(
-            int(16 * scale), int(8 * scale), dropout=dropout, use_subspectral=use_subspectral
+            int(16 * scale),
+            int(8 * scale),
+            dropout=dropout,
+            use_subspectral=use_subspectral,
         )
         self.n11 = NormalBlock(
             int(8 * scale), dropout=dropout, use_subspectral=use_subspectral
@@ -35,7 +38,10 @@ class BcResNetModel(nn.Module):
             use_subspectral=use_subspectral,
         )
         self.n21 = NormalBlock(
-            int(12 * scale), dilation=2, dropout=dropout, use_subspectral=use_subspectral
+            int(12 * scale),
+            dilation=2,
+            dropout=dropout,
+            use_subspectral=use_subspectral,
         )
 
         self.t3 = TransitionBlock(
@@ -47,13 +53,22 @@ class BcResNetModel(nn.Module):
             use_subspectral=use_subspectral,
         )
         self.n31 = NormalBlock(
-            int(16 * scale), dilation=4, dropout=dropout, use_subspectral=use_subspectral
+            int(16 * scale),
+            dilation=4,
+            dropout=dropout,
+            use_subspectral=use_subspectral,
         )
         self.n32 = NormalBlock(
-            int(16 * scale), dilation=4, dropout=dropout, use_subspectral=use_subspectral
+            int(16 * scale),
+            dilation=4,
+            dropout=dropout,
+            use_subspectral=use_subspectral,
         )
         self.n33 = NormalBlock(
-            int(16 * scale), dilation=4, dropout=dropout, use_subspectral=use_subspectral
+            int(16 * scale),
+            dilation=4,
+            dropout=dropout,
+            use_subspectral=use_subspectral,
         )
 
         self.t4 = TransitionBlock(
@@ -64,16 +79,27 @@ class BcResNetModel(nn.Module):
             use_subspectral=use_subspectral,
         )
         self.n41 = NormalBlock(
-            int(20 * scale), dilation=8, dropout=dropout, use_subspectral=use_subspectral
+            int(20 * scale),
+            dilation=8,
+            dropout=dropout,
+            use_subspectral=use_subspectral,
         )
         self.n42 = NormalBlock(
-            int(20 * scale), dilation=8, dropout=dropout, use_subspectral=use_subspectral
+            int(20 * scale),
+            dilation=8,
+            dropout=dropout,
+            use_subspectral=use_subspectral,
         )
         self.n43 = NormalBlock(
-            int(20 * scale), dilation=8, dropout=dropout, use_subspectral=use_subspectral
+            int(20 * scale),
+            dilation=8,
+            dropout=dropout,
+            use_subspectral=use_subspectral,
         )
 
-        self.dw_conv = nn.Conv2d(int(20 * scale), int(20 * scale), kernel_size=(5, 5), groups=int(20 * scale))
+        self.dw_conv = nn.Conv2d(
+            int(20 * scale), int(20 * scale), kernel_size=(5, 5), groups=int(20 * scale)
+        )
         self.onexone_conv = nn.Conv2d(int(20 * scale), int(32 * scale), kernel_size=1)
 
         self.head_conv = nn.Conv2d(int(32 * scale), n_class, kernel_size=1)

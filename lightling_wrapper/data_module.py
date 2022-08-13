@@ -67,9 +67,8 @@ class DistillSpeechCommandDataModule(SpeechCommandDataModule):
     def train_dataloader(self):
         return torch.utils.data.DataLoader(
             self.dataset_obj(
-                logit_path=self.logit_path,
-                subset="train", 
-                data_dir=self.data_dir),
+                logit_path=self.logit_path, subset="train", data_dir=self.data_dir
+            ),
             batch_size=self.batch_size,
             shuffle=True,
             collate_fn=self.collate_fn,
@@ -80,9 +79,8 @@ class DistillSpeechCommandDataModule(SpeechCommandDataModule):
     def val_dataloader(self):
         return torch.utils.data.DataLoader(
             self.dataset_obj(
-                logit_path=self.logit_path,
-                subset="train", 
-                data_dir=self.data_dir),
+                logit_path=self.logit_path, subset="train", data_dir=self.data_dir
+            ),
             batch_size=self.batch_size,
             shuffle=False,
             collate_fn=self.collate_fn,
@@ -93,9 +91,8 @@ class DistillSpeechCommandDataModule(SpeechCommandDataModule):
     def test_dataloader(self):
         return torch.utils.data.DataLoader(
             self.dataset_obj(
-                logit_path=self.logit_path,
-                subset="train", 
-                data_dir=self.data_dir),
+                logit_path=self.logit_path, subset="train", data_dir=self.data_dir
+            ),
             batch_size=self.batch_size,
             shuffle=False,
             collate_fn=self.collate_fn,
