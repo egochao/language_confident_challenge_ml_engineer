@@ -4,7 +4,7 @@ BATCH_SIZE = 256
 ORIGINAL_SAMPLE_RATE = 16000
 NEW_SAMPLE_RATE = 8000
 EPS = 1e-9
-SCALE_BC_RESNET = 0.64  # Smallest model in bc_resnet farmily
+SCALE_BC_RESNET = 1  # Smallest model in bc_resnet farmily
 
 
 DATA_DIR = Path("./data/")
