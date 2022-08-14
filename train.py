@@ -36,6 +36,8 @@ if __name__ == "__main__":
         loss_fn = F.nll_loss
         collate_fn = mel_collate_fn
         dataset_fn = MelSpecDataSet
+    else:
+        raise ValueError("Invalid model name")
 
     pl.seed_everything(0)
     wandb_logger = WandbLogger(project="ViT_experiments")
