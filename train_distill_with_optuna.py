@@ -2,7 +2,7 @@ import pytorch_lightning as pl
 from torch.nn import functional as F
 import optuna
 from optuna.integration import PyTorchLightningPruningCallback
-
+import logging
 import argparse
 
 import constants
@@ -14,6 +14,10 @@ from models.bc_resnet.mel_spec_dataset import MelSpecDataSet, MelSpecWithLogitDa
 from models.simple_conv.base_dataset import AudioArrayDataSet, AudioArrayWithLogitDataset, simconv_collate_fn, simconv_collate_logit_fn
 from models.simple_conv.simple_conv_model import SimpleConv, SimpleConvNoSoftMax
 from utils.model_utils import distillation_loss
+
+
+logging.getLogger().setLevel(logging.INFO)
+logging.getLogger().addHandler(logging.FileHandler('foo_distill.log'))
 
 
 def sim_conv_param_search(trial: optuna.trial.Trial) -> float:
@@ -94,7 +98,12 @@ if __name__ == "__main__":
 
     pruner: optuna.pruners.BasePruner = optuna.pruners.MedianPruner()
 
+    optuna.logging.enable_propagation()  # enable optuna logging
+    optuna.logging.disable_default_handler()  # Stop showing logs in stderr.
+
     study = optuna.create_study(direction="maximize", pruner=pruner)
+    logging.getLogger().info("Start optimization.")
+
 
     if args.model == "sim_conv" or args.model is None:
         study.optimize(sim_conv_param_search, n_trials=200, timeout=None)

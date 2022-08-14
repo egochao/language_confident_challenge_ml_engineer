@@ -3,6 +3,7 @@ from torch.nn import functional as F
 import optuna
 from optuna.integration import PyTorchLightningPruningCallback
 
+import logging
 import argparse
 
 import constants
@@ -11,6 +12,10 @@ from models.bc_resnet.bc_resnet_model import BcResNetModel
 from models.bc_resnet.mel_spec_dataset import MelSpecDataSet, mel_collate_fn
 from models.simple_conv.base_dataset import AudioArrayDataSet, simconv_collate_fn
 from models.simple_conv.simple_conv_model import SimpleConv
+
+
+logging.getLogger().setLevel(logging.INFO)
+logging.getLogger().addHandler(logging.FileHandler('foo.log'))
 
 
 def sim_conv_param_search(trial: optuna.trial.Trial) -> float:
@@ -88,13 +93,16 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     pruner: optuna.pruners.BasePruner = optuna.pruners.MedianPruner()
+    optuna.logging.enable_propagation()  # enable optuna logging
+    optuna.logging.disable_default_handler()  # Stop showing logs in stderr.
 
     study = optuna.create_study(direction="maximize", pruner=pruner)
+    logging.getLogger().info("Start optimization.")
 
     if args.model == "sim_conv" or args.model is None:
         study.optimize(sim_conv_param_search, n_trials=200, timeout=None)
     elif args.model == "bc_resnet":
-        study.optimize(bc_resnet_param_search, n_trials=1000, timeout=None)
+        study.optimize(bc_resnet_param_search, n_trials=100, timeout=None)
 
     print("Number of finished trials: {}".format(len(study.trials)))
 
