@@ -60,7 +60,7 @@ class SpeechCommandDataModule(LightningDataModule):
 
 
 class DistillSpeechCommandDataModule(SpeechCommandDataModule):
-    def __init__(self, logit_path: Path, *args, **kwargs):
+    def __init__(self, *args, logit_path: Path = constants.LOGITS_PATH, **kwargs, ):
         super().__init__(*args, **kwargs)
         self.logit_path = logit_path
 

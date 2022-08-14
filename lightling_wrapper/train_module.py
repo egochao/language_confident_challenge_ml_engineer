@@ -73,13 +73,16 @@ class BaseTorchLightlingWrapper(pl.LightningModule):
 
 
 class DistillModelTorchLightlingWrapper(BaseTorchLightlingWrapper):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, alpha=constants.ALPHA, temperature=constants.TEMPERATURE, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.alpha = alpha
+        self.temperature = temperature
 
     def training_step(self, batch, batch_idx):
         x, teacher_preds, y = batch
         logits = self(x)
-        loss = self.loss_fn(logits, teacher_preds, y)
+        loss = self.loss_fn(logits, teacher_preds, y, alpha=self.alpha, temperature=self.temperature)
 
         preds = torch.argmax(logits, dim=1)
         acc = self._metric(preds, y)
@@ -91,7 +94,7 @@ class DistillModelTorchLightlingWrapper(BaseTorchLightlingWrapper):
     def validation_step(self, batch, batch_idx):
         x, teacher_preds, y = batch
         logits = self(x)
-        loss = self.loss_fn(logits, teacher_preds, y)
+        loss = self.loss_fn(logits, teacher_preds, y, alpha=self.alpha, temperature=self.temperature)
 
         preds = torch.argmax(logits, dim=1)
         acc = self._metric(preds, y)
@@ -102,7 +105,7 @@ class DistillModelTorchLightlingWrapper(BaseTorchLightlingWrapper):
     def test_step(self, batch, batch_idx):
         x, teacher_preds, y = batch
         logits = self(x)
-        loss = self.loss_fn(logits, teacher_preds, y)
+        loss = self.loss_fn(logits, teacher_preds, y, alpha=self.alpha, temperature=self.temperature)
 
         preds = torch.argmax(logits, dim=1)
         acc = self._metric(preds, y)

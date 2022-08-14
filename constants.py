@@ -13,6 +13,12 @@ LEARNING_RATE = 1e-2
 EPOCHS = 50
 DROPOUT = 0.1
 
+# distill loss
+ALPHA = 0.1
+TEMPERATURE = 10
+
+LOGITS_PATH = Path("./data/teacher_logits")
+
 NUM_WORKERS = 2
 PIN_MEMORY = True
 
