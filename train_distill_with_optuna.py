@@ -1,18 +1,16 @@
 import pytorch_lightning as pl
-from torch.nn import functional as F
 import optuna
 from optuna.integration import PyTorchLightningPruningCallback
 import logging
 import argparse
 
 import constants
-from lightling_wrapper import BaseTorchLightlingWrapper, SpeechCommandDataModule
 from lightling_wrapper.data_module import DistillSpeechCommandDataModule
 from lightling_wrapper.train_module import DistillModelTorchLightlingWrapper
-from models.bc_resnet.bc_resnet_model import BcResNetModel, BcResNetModelNoSoftMax
-from models.bc_resnet.mel_spec_dataset import MelSpecDataSet, MelSpecWithLogitDataset, mel_collate_fn, mel_collate_logit_fn
-from models.simple_conv.base_dataset import AudioArrayDataSet, AudioArrayWithLogitDataset, simconv_collate_fn, simconv_collate_logit_fn
-from models.simple_conv.simple_conv_model import SimpleConv, SimpleConvNoSoftMax
+from models.bc_resnet.bc_resnet_model import BcResNetModelNoSoftMax
+from models.bc_resnet.mel_spec_dataset import MelSpecWithLogitDataset, mel_collate_logit_fn
+from models.simple_conv.base_dataset import AudioArrayWithLogitDataset, simconv_collate_logit_fn
+from models.simple_conv.simple_conv_model import SimpleConvNoSoftMax
 from utils.model_utils import distillation_loss
 
 
