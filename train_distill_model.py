@@ -26,7 +26,7 @@ from utils.model_utils import distillation_loss
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", type=str)
-    parser.add_argument("--logit", type=str, default="data/teacher_logits")
+    parser.add_argument("--logit", type=str, default=str(constants.LOGITS_PATH))
     parser.add_argument("--batch_size", type=int, default=constants.BATCH_SIZE)
     parser.add_argument("--lr", type=float, default=constants.LEARNING_RATE)
     parser.add_argument("--epochs", type=int, default=constants.EPOCHS)
