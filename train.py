@@ -59,3 +59,4 @@ if __name__ == "__main__":
         trainer = pl.Trainer(max_epochs=args.epochs, logger=wandb_logger)
 
     trainer.fit(model, data_module)
+    trainer.test(ckpt_path="best")

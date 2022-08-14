@@ -28,7 +28,7 @@ def sim_conv_param_search(trial: optuna.trial.Trial) -> float:
     temperature = trial.suggest_int("temperature", 2, 20)
 
     model = DistillModelTorchLightlingWrapper(
-        core_model=SimpleConvNoSoftMax(),
+        core_model=SimpleConvNoSoftMax(n_channel=33, kernel_size_l1=84),
         loss_fn=loss_fn,
         learning_rate=constants.LEARNING_RATE,
         alpha=alpha, temperature=temperature
@@ -104,9 +104,9 @@ if __name__ == "__main__":
 
 
     if args.model == "sim_conv" or args.model is None:
-        study.optimize(sim_conv_param_search, n_trials=200, timeout=None)
+        study.optimize(sim_conv_param_search, n_trials=50, timeout=None)
     elif args.model == "bc_resnet":
-        study.optimize(bc_resnet_param_search, n_trials=1000, timeout=None)
+        study.optimize(bc_resnet_param_search, n_trials=50, timeout=None)
 
     print("Number of finished trials: {}".format(len(study.trials)))
 

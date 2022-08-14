@@ -2,7 +2,6 @@ import argparse
 
 import pytorch_lightning as pl
 import torch
-from pytorch_lightning.loggers import WandbLogger
 from torch.nn import functional as F
 
 import constants
@@ -54,4 +53,4 @@ if __name__ == "__main__":
     else:
         trainer = pl.Trainer()
 
-    trainer.test(model, data_module)
+    trainer.test(model, data_module, ckpt_path=args.pretrain)
