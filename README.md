@@ -116,5 +116,6 @@ This will spin up the development environment with minimal setup.
 ### 7. Link to trained model + resource
 
 - [Logit data](https://drive.google.com/file/d/1VhFxooFVE6Ph4V2QSM4PMyMPNW9iZg9g/view?usp=sharing)
-- [Best simple convolution](https://drive.google.com/file/d/1UUiVjE6VYYbvXDA6bBnv4zCKe89vHLs1/view?usp=sharing) : 95.1%
-- [Best Bc ResNet](https://drive.google.com/file/d/1yg8Aag0k_DMn4X25vaI7Vb8R32DuWBw7/view?usp=sharing) : 98.3%
+- [Best simple convolution](https://drive.google.com/file/d/1UUiVjE6VYYbvXDA6bBnv4zCKe89vHLs1/view?usp=sharing) : 95.1% [link to wandb report](https://wandb.ai/johnoldman/ViT_experiments/reports/Simple-convolution-with-optuna-parameters--VmlldzoyNDc0Mjgy?accessToken=kl36zi4301sy0b880d3q20m7x8u5fty3mgxj6i7w5a1xxu40pum2lhci80fbp7yt)
+- [Best Bc ResNet](https://drive.google.com/file/d/1yg8Aag0k_DMn4X25vaI7Vb8R32DuWBw7/view?usp=sharing) : 98.3% [link to wandb report](https://wandb.ai/johnoldman/ViT_experiments/reports/Best-bc-resnet---VmlldzoyNDc0NjAw?accessToken=0gusdixg3zt5aigffk9ueeca5gz3qsnbf7ofri1ex36jc1pfasx2ot31tm34743m)
+
