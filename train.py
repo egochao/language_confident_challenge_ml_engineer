@@ -60,4 +60,4 @@ if __name__ == "__main__":
         trainer = pl.Trainer(max_epochs=args.epochs, logger=wandb_logger)
 
     trainer.fit(model, data_module)
-    trainer.test(model, data_module=data_module, ckpt_path="best")
+    trainer.test(model, data_module, ckpt_path="best")

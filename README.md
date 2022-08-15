@@ -8,7 +8,8 @@
 - [5. The result](#5-the-result)
   - [a. Model include in the work - No parameters search](#a-model-include-in-the-work---no-parameters-search)
   - [b. Model optimized with Optuna](#b-model-optimized-with-optuna)
-  - [b. Model train with distillation loss](#b-model-train-with-distillation-loss)
+  - [c. Model train with distillation loss](#c-model-train-with-distillation-loss)
+  - [d. Hightlight point](#d-hightlight-point)
 - [6. Other Development setups](#6-other-development-setups)
   - [Poetry usage](#poetry-usage)
 - [7. Link to trained model + resource](#7-link-to-trained-model--resource)
@@ -69,22 +70,32 @@ This will spin up the development environment with minimal setup.
 ### 5. The result
 
 #### a. Model include in the work - No parameters search
-| Model      | Description |  Params-byte size | Model accuracy | |
+| Model      | Description |  Params | Model accuracy | |
 | ----------- | ----------- | ----------- | ----------- | ----------- | 
-| Simple Convolution      | A straight forward 1D convolution    | 26900 - 108kb | 94.2% |
-| BC Resnet   | Experiment logging        | 10600 - 42 kb | 95.6% |  |
+| Simple Convolution      | A straight forward 1D convolution    | 26900 | 94.2% |
+| BC Resnet   | Experiment logging        | 10600 | 95.6% |  |
 
 #### b. Model optimized with Optuna
-| Model      | Description |  Params-byte size | Model accuracy | |
+| Model      | Description |  Params | Model accuracy | |
 | ----------- | ----------- | ----------- | ----------- | ----------- | 
-| Simple Convolution      | A straight forward 1D convolution    | 35000 - 140kb | 95.1% | |
+| Simple Convolution      | A straight forward 1D convolution    | 35000 | 95.1% | |
+| BC Resnet   | Experiment logging        | 22000 | 98.3% - best | |
+
+#### c. Model train with distillation loss
+| Model      | Description |  Params | Model accuracy | |
+| ----------- | ----------- | ----------- | ----------- | ----------- | 
+| Simple Convolution      | A straight forward 1D convolution    | 28600 | 90.3% | |
 | BC Resnet   | Experiment logging        |  |  | |
 
-#### b. Model train with distillation loss
-| Model      | Description |  Params-byte size | Model accuracy | |
-| ----------- | ----------- | ----------- | ----------- | ----------- | 
-| Simple Convolution      | A straight forward 1D convolution    | 28600 - 114kb | 90.3% | |
-| BC Resnet   | Experiment logging        |  |  | |
+
+#### d. Hightlight point
+- My best model have 22k parameters and accuracy on test set = 98.3% (Optuna optimized)
+- Almost beat the state-of-art(98.5)
+- The model size is superior compare with all other state-of-art model by some order of magnitude
+- The distillation process is not success and it causing the model perform worst than non distill
+
+![image]([data/my_best_result.png](https://github.com/egochao/ml_engineer_lc/blob/main/data/my_best_result.png))
+
 
 ### 6. Other Development setups
 
@@ -104,3 +115,6 @@ This will spin up the development environment with minimal setup.
 
 ### 7. Link to trained model + resource
 
+- [Logit data](https://drive.google.com/file/d/1VhFxooFVE6Ph4V2QSM4PMyMPNW9iZg9g/view?usp=sharing)
+- [Best simple convolution](https://drive.google.com/file/d/1UUiVjE6VYYbvXDA6bBnv4zCKe89vHLs1/view?usp=sharing) : 95.1%
+- [Best Bc ResNet](https://drive.google.com/file/d/1yg8Aag0k_DMn4X25vaI7Vb8R32DuWBw7/view?usp=sharing) : 98.3%
