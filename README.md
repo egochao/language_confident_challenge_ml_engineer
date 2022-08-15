@@ -95,7 +95,7 @@ This will spin up the development environment with minimal setup.
 - The distillation process is not success and it causing the model perform worst than non distill
 
 <!-- ![image](https://github.com/egochao/speech_commands_distillation_torch_lightling/blob/main/my_best_result.png = =100x20) -->
-<img src="https://github.com/egochao/speech_commands_distillation_torch_lightling/blob/main/my_best_result.png" width="300" height="300" />
+<img src="https://github.com/egochao/speech_commands_distillation_torch_lightling/blob/main/my_best_result.png" width="500" height="300" />
 
 ### 6. Other Development setups
 
