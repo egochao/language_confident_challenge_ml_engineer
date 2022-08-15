@@ -27,12 +27,13 @@ if __name__ == "__main__":
     args = parse_args()
 
     if args.model == "conv" or args.model is None:
-        core_model = SimpleConv()
+        core_model = SimpleConv(n_channel=constants.N_CHANNEL, kernel_size_l1=constants.KERNEL_SIZE_L1)
         loss_fn = F.nll_loss
         collate_fn = simconv_collate_fn
         dataset_fn = AudioArrayDataSet
     elif args.model == "bc_resnet":
-        core_model = BcResNetModel(scale=constants.SCALE_BC_RESNET)
+        core_model = BcResNetModel(
+            scale=constants.SCALE_BC_RESNET, dropout=constants.DROPOUT)
         loss_fn = F.nll_loss
         collate_fn = mel_collate_fn
         dataset_fn = MelSpecDataSet
@@ -59,4 +60,4 @@ if __name__ == "__main__":
         trainer = pl.Trainer(max_epochs=args.epochs, logger=wandb_logger)
 
     trainer.fit(model, data_module)
-    trainer.test(ckpt_path="best")
+    trainer.test(model, data_module=data_module, ckpt_path="best")

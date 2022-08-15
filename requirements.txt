@@ -16,3 +16,4 @@ pytorch-lightning
 pydantic
 optuna
 googledrivedownloader
+librosa

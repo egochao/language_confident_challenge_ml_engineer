@@ -4,14 +4,20 @@ BATCH_SIZE = 256
 ORIGINAL_SAMPLE_RATE = 16000
 NEW_SAMPLE_RATE = 8000
 EPS = 1e-9
-SCALE_BC_RESNET = 1  # Smallest model in bc_resnet farmily
 
 
 DATA_DIR = Path("./data/")
 SUB_DATASET_PATH = "SpeechCommands/speech_commands_v0.02/"
 LEARNING_RATE = 1e-2
 EPOCHS = 50
-DROPOUT = 0.1
+
+# bc resnet
+SCALE_BC_RESNET = 1.68133218445745 # Smallest model in bc_resnet farmily
+DROPOUT = 0.004449593515468614
+
+# simple conv
+N_CHANNEL = 37
+KERNEL_SIZE_L1 = 79
 
 # distill loss
 ALPHA = 0.1
