@@ -94,8 +94,7 @@ This will spin up the development environment with minimal setup.
 - The model size is superior compare with all other state-of-art model by some order of magnitude
 - The distillation process is not success and it causing the model perform worst than non distill
 
-![image]([data/my_best_result.png](https://github.com/egochao/ml_engineer_lc/blob/main/data/my_best_result.png))
-
+![image](https://github.com/egochao/speech_commands_distillation_torch_lightling/blob/main/my_best_result.png)
 
 ### 6. Other Development setups
 
