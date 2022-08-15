@@ -1,5 +1,3 @@
-#### Distill state of art model https://github.com/YuanGongND/ast to a smaller model(Conv, Simple Attention) for Speech Command dataset
-
 ## 1. What we are doing
 
 ### 1.1. The problems:
@@ -38,6 +36,19 @@ This will spin up the development environment with minimal setup.
 ```shell
     python train.py --model bc_resnet
 ```
+
+## 4. Steps to test the model
+
+1. Train simple convolution
+```shell
+    python test.py --pretrain path_to_pretrain
+```
+
+2. Train Bc ResNet model
+```shell
+    python train.py --model bc_resnet --pretrain path_to_pretrain
+```
+
 
 NOTE: You can run other training script with same args
 
